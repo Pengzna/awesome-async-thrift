@@ -30,8 +30,9 @@
   <modules>
     <module>thrift-core</module>
     <module>thrift-common</module>
-    <module>node</module>
-      <module>node-common</module>
+    <module>cnode</module>
+    <module>dnode</module>
+    <module>node-common</module>
   </modules>
 
   <properties>
