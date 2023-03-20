@@ -17,11 +17,16 @@
  * under the License.
  */
 
-namespace java com.timecho.aweseme.thrift
+package com.timecho.awesome.service;
 
-service ICNodeRPCService {
+public interface IService {
 
-  i64 cpuRequest(i64 n)
+  /** Start current service. */
+  void start();
 
-  bool ioRequest()
+  /**
+   * Stop current service. If current service uses thread or thread pool, current service should
+   * guarantee to putBack thread or thread pool.
+   */
+  void stop();
 }

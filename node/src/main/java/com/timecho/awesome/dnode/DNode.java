@@ -17,11 +17,20 @@
  * under the License.
  */
 
-namespace java com.timecho.aweseme.thrift
+package com.timecho.awesome.dnode;
 
-service ICNodeRPCService {
+import com.timecho.awesome.conf.NodeConfig;
+import com.timecho.awesome.conf.NodeDescriptor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-  i64 cpuRequest(i64 n)
+public class DNode {
 
-  bool ioRequest()
+  private static final Logger LOGGER = LoggerFactory.getLogger(DNode.class);
+
+  private static final NodeConfig CONF = NodeDescriptor.getInstance().getConf();
+
+  public static void main(String[] args) {
+    LOGGER.info("Hello, I'm DNode!");
+  }
 }

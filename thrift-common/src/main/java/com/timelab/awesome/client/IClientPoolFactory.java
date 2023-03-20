@@ -17,11 +17,18 @@
  * under the License.
  */
 
-namespace java com.timecho.aweseme.thrift
+package com.timelab.awesome.client;
 
-service ICNodeRPCService {
+import org.apache.commons.pool2.KeyedObjectPool;
 
-  i64 cpuRequest(i64 n)
+public interface IClientPoolFactory<K, V> {
 
-  bool ioRequest()
+  /**
+   * We can implement this interface in other modules and then set the corresponding expected
+   * parameters and client factory classes.
+   *
+   * @param manager the reference to the clientManager
+   * @return A concurrency safe object pool
+   */
+  KeyedObjectPool<K, V> createClientPool(ClientManager<K, V> manager);
 }

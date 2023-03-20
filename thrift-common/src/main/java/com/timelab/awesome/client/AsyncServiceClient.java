@@ -19,8 +19,7 @@
 
 package com.timelab.awesome.client;
 
-import com.timecho.aweseme.thrift.IService;
-import com.timecho.aweseme.thrift.Service;
+import com.timecho.aweseme.thrift.ICNodeRPCService;
 import com.timecho.aweseme.thrift.TEndPoint;
 import java.io.IOException;
 import org.apache.thrift.async.TAsyncClientManager;
@@ -28,7 +27,7 @@ import org.apache.thrift.protocol.TProtocolFactory;
 import org.apache.thrift.transport.TNonblockingSocket;
 import org.apache.thrift.transport.TTransportException;
 
-public class AsyncServiceClient extends Service.AsyncClient {
+public class AsyncServiceClient extends ICNodeRPCService.AsyncClient {
 
   private static final int CONNECTION_TIMEOUT = 20_000;
 
@@ -39,7 +38,7 @@ public class AsyncServiceClient extends Service.AsyncClient {
       TAsyncClientManager clientManager,
       TEndPoint endpoint,
       ClientManager clientManager1) throws IOException {
-    super(protocolFactory, clientManager, wrapper(endpoint.getHost(), endpoint.getPort()));
+    super(protocolFactory, clientManager, wrapper(endpoint.getIp(), endpoint.getPort()));
     this.endpoint = endpoint;
     this.clientManager = clientManager1;
   }

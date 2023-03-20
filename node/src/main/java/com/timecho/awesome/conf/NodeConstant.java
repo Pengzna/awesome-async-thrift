@@ -17,11 +17,21 @@
  * under the License.
  */
 
-namespace java com.timecho.aweseme.thrift
+package com.timecho.awesome.conf;
 
-service ICNodeRPCService {
+public class NodeConstant {
 
-  i64 cpuRequest(i64 n)
+  public static final String CNODE_HOME = "CNODE_HOME";
+  public static final String CNODE_CONF = "CNODE_CONF";
 
-  bool ioRequest()
+  public static final String CONFIG_FILE_NAME = "node.properties";
+
+  public static final String REQUEST_TYPE = "request_type";
+
+  public static final String CNODE_SERVER_TYPE = "cnode_server_type";
+  public static final String CNODE_SELECTOR_NUM = "cnode_selector_num";
+  public static final String CNODE_MAX_THREAD_POOL_SIZE = "cnode_max_thread_pool_size";
+
+  public static final String DNODE_REQUEST_NUM = "dnode_request_num";
+  public static final String DNODE_CONCURRENT_CLIENT_NUM = "dnode_concurrent_client_num";
 }

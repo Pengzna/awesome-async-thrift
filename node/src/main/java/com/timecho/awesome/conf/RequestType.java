@@ -17,11 +17,30 @@
  * under the License.
  */
 
-namespace java com.timecho.aweseme.thrift
+package com.timecho.awesome.conf;
 
-service ICNodeRPCService {
+import com.timecho.awesome.exception.ConfigurationException;
 
-  i64 cpuRequest(i64 n)
+public enum RequestType {
+  IO("IO"),
+  CPU("CPU");
 
-  bool ioRequest()
+  private final String requestType;
+
+  RequestType(String requestType) {
+    this.requestType = requestType;
+  }
+
+  public String getRequestType() {
+    return requestType;
+  }
+
+  public static RequestType parse(String type) throws ConfigurationException {
+    for (RequestType requestType : RequestType.values()) {
+      if (type.equals(requestType.getRequestType())) {
+        return requestType;
+      }
+    }
+    throw new ConfigurationException(String.format("RequestType %s doesn't exist.", type));
+  }
 }

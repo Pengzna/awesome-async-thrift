@@ -19,9 +19,13 @@
 
 namespace java com.timecho.aweseme.thrift
 
-service ICNodeRPCService {
+struct TEndPoint {
+  1: required string ip
+  2: required i32 port
+}
 
-  i64 cpuRequest(i64 n)
-
-  bool ioRequest()
+struct TDNodeConfiguration {
+  1: required string requestType
+  2: required i32 dnodeRequestNum
+  3: required i32 dnodeConcurrentClientNum
 }

@@ -20,20 +20,74 @@
 package com.timelab.awesome.client;
 
 import com.timecho.aweseme.thrift.TEndPoint;
+import com.timelab.awesome.client.exception.BorrowNullClientManagerException;
+import com.timelab.awesome.client.exception.ClientManagerException;
 import org.apache.commons.pool2.KeyedObjectPool;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-public class ClientManager {
+import java.util.Optional;
 
-  private final KeyedObjectPool<TEndPoint, AsyncServiceClient> pool;
+public class ClientManager<K, V> implements IClientManager<K, V> {
 
-  public ClientManager() {
-    this.pool = new;
+  private static final Logger logger = LoggerFactory.getLogger(ClientManager.class);
+
+  private final KeyedObjectPool<K, V> pool;
+
+  ClientManager(IClientPoolFactory<K, V> factory) {
+    pool = factory.createClientPool(this);
   }
 
-
-  public V borrowClient(K node) throws Exception {
-    return pool.borrowObject(node);
+  public KeyedObjectPool<K, V> getPool() {
+    return pool;
   }
 
+  @Override
+  public V borrowClient(K node) throws ClientManagerException {
+    if (node == null) {
+      throw new BorrowNullClientManagerException();
+    }
+    try {
+      return pool.borrowObject(node);
+    } catch (Exception e) {
+      throw new ClientManagerException(e);
+    }
+  }
 
+  /**
+   * return a client V for node K to the ClientManager.
+   *
+   * <p>Note: We do not define this interface in IClientManager to make you aware that the return of
+   * a client is automatic whenever a particular client is used.
+   */
+  public void returnClient(K node, V client) {
+    Optional.ofNullable(node)
+      .ifPresent(
+        x -> {
+          try {
+            pool.returnObject(node, client);
+          } catch (Exception e) {
+            logger.warn(
+              String.format("Return client %s for node %s to pool failed.", client, node), e);
+          }
+        });
+  }
+
+  @Override
+  public void clear(K node) {
+    Optional.ofNullable(node)
+      .ifPresent(
+        x -> {
+          try {
+            pool.clear(node);
+          } catch (Exception e) {
+            logger.warn(String.format("Clear all client in pool for node %s failed.", node), e);
+          }
+        });
+  }
+
+  @Override
+  public void close() {
+    pool.close();
+  }
 }

@@ -17,11 +17,30 @@
  * under the License.
  */
 
-namespace java com.timecho.aweseme.thrift
+package com.timecho.awesome.conf;
 
-service ICNodeRPCService {
+import com.timecho.awesome.exception.ConfigurationException;
 
-  i64 cpuRequest(i64 n)
+public enum ServerType {
+  ASYNC("ASYNC"),
+  SYNC("SYNC");
 
-  bool ioRequest()
+  private final String serverType;
+
+  ServerType(String serverType) {
+    this.serverType = serverType;
+  }
+
+  public String getServerType() {
+    return serverType;
+  }
+
+  public static ServerType parse(String type) throws ConfigurationException {
+    for (ServerType serverType : ServerType.values()) {
+      if (type.equals(serverType.getServerType())) {
+        return serverType;
+      }
+    }
+    throw new ConfigurationException(String.format("ServerType %s doesn't exist.", type));
+  }
 }

@@ -17,11 +17,11 @@
  * under the License.
  */
 
+include "common.thrift"
+
 namespace java com.timecho.aweseme.thrift
 
-service ICNodeRPCService {
+service IDNodeRPCService {
 
-  i64 cpuRequest(i64 n)
-
-  bool ioRequest()
+  void activateDNode(common.TDNodeConfiguration configuration)
 }

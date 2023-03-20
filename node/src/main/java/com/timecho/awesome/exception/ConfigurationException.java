@@ -17,11 +17,11 @@
  * under the License.
  */
 
-namespace java com.timecho.aweseme.thrift
+package com.timecho.awesome.exception;
 
-service ICNodeRPCService {
+public class ConfigurationException extends Exception {
 
-  i64 cpuRequest(i64 n)
-
-  bool ioRequest()
+  public ConfigurationException(String message) {
+    super(message);
+  }
 }
