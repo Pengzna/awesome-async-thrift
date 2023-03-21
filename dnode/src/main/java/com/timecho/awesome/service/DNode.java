@@ -20,9 +20,8 @@
 package com.timecho.awesome.service;
 
 import com.timecho.awesome.conf.NodeConstant;
+import com.timecho.awesome.exception.StartupException;
 import com.timecho.awesome.service.thrift.DNodeRPCService;
-import com.timecho.awesome.thrift.JMXService;
-import com.timecho.awesome.thrift.ServiceType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,26 +36,39 @@ public class DNode implements DNodeMBean {
   private final RegisterManager registerManager = new RegisterManager();
 
   public static void main(String[] args) {
-    LOGGER.info("Hello, I'm DNode!");
-    DNode.getInstance().doMain();
+    LOGGER.info("Activating {}...", NodeConstant.DNODE);
+    DNode.getInstance().activate();
+    LOGGER.info("{} is successfully started, waiting for CNode's schedule.", NodeConstant.DNODE);
   }
 
-  private void doMain() {
-    setUpJMXService();
-    setUpRPCService();
+  private void activate() {
+    try {
+      setUpJMXService();
+      setUpRPCService();
+    } catch (StartupException e) {
+      LOGGER.error("Meet error when startup.", e);
+      deactivate();
+    }
   }
 
-  private void setUpJMXService() {
-    // Setup JMXService
+  private void setUpJMXService() throws StartupException {
     registerManager.register(new JMXService());
     JMXService.registerMBean(this, mbeanName);
-    LOGGER.info("Successfully setup {}.", ServiceType.JMX_SERVICE.getName());
+    LOGGER.info("Successfully setup {}.", JMXService.ServiceType.JMX_SERVICE.getName());
   }
 
-  private void setUpRPCService() {
+  private void setUpRPCService() throws StartupException {
     DNodeRPCService dNodeRPCService = new DNodeRPCService();
     registerManager.register(dNodeRPCService);
-    LOGGER.info("Successfully setup {}.", ServiceType.DNODE_SERVICE.getName());
+    LOGGER.info("Successfully setup {}.", JMXService.ServiceType.DNODE_SERVICE.getName());
+  }
+
+  private void deactivate() {
+    LOGGER.warn("Deactivating {}...", NodeConstant.DNODE);
+    registerManager.deregisterAll();
+    JMXService.deregisterMBean(mbeanName);
+    LOGGER.info("{} is deactivated.", NodeConstant.DNODE);
+    System.exit(-1);
   }
 
   private DNode() {

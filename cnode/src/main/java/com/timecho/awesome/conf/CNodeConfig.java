@@ -21,14 +21,70 @@ package com.timecho.awesome.conf;
 
 public class CNodeConfig {
 
+  private String cnRpcAddress = "127.0.0.1";
+  private int cnRpcPort = 10710;
+
   private RequestType requestType = RequestType.IO;
 
-  private CNodeServerType cnodeCNodeServerType = CNodeServerType.ASYNC;
-  private int cnodeSelectorNum = 4;
-  private int cnodeMaxThreadPoolSize = 65535;
+  private CNodeServerType cnServerType = CNodeServerType.ASYNC;
+  private int cnSelectorNum = 4;
+  private int cnMaxThreadPoolSize = 65535;
 
-  private int dnodeRequestNum = 300;
-  private int dnodeConcurrentClientNum = 20;
+  private int cnMinConcurrentClientNum = Runtime.getRuntime().availableProcessors();
+  private int cnMaxConcurrentClientNum = 65535;
+  private int cnThriftServerAwaitTimeForStopService = 60;
+  private boolean cnRpcThriftCompressionEnabled = false;
+
+  private int dnRequestNum = 300;
+  private int dnConcurrentClientNum = 65535;
+
+  public int getCnMinConcurrentClientNum() {
+    return cnMinConcurrentClientNum;
+  }
+
+  public void setCnMinConcurrentClientNum(int cnMinConcurrentClientNum) {
+    this.cnMinConcurrentClientNum = cnMinConcurrentClientNum;
+  }
+
+  public int getCnMaxConcurrentClientNum() {
+    return cnMaxConcurrentClientNum;
+  }
+
+  public void setCnMaxConcurrentClientNum(int cnMaxConcurrentClientNum) {
+    this.cnMaxConcurrentClientNum = cnMaxConcurrentClientNum;
+  }
+
+  public int getCnThriftServerAwaitTimeForStopService() {
+    return cnThriftServerAwaitTimeForStopService;
+  }
+
+  public void setCnThriftServerAwaitTimeForStopService(int cnThriftServerAwaitTimeForStopService) {
+    this.cnThriftServerAwaitTimeForStopService = cnThriftServerAwaitTimeForStopService;
+  }
+
+  public boolean isCnRpcThriftCompressionEnabled() {
+    return cnRpcThriftCompressionEnabled;
+  }
+
+  public void setCnRpcThriftCompressionEnabled(boolean cnRpcThriftCompressionEnabled) {
+    this.cnRpcThriftCompressionEnabled = cnRpcThriftCompressionEnabled;
+  }
+
+  public String getCnRpcAddress() {
+    return cnRpcAddress;
+  }
+
+  public void setCnRpcAddress(String cnRpcAddress) {
+    this.cnRpcAddress = cnRpcAddress;
+  }
+
+  public int getCnRpcPort() {
+    return cnRpcPort;
+  }
+
+  public void setCnRpcPort(int cnRpcPort) {
+    this.cnRpcPort = cnRpcPort;
+  }
 
   public RequestType getRequestType() {
     return requestType;
@@ -38,44 +94,44 @@ public class CNodeConfig {
     this.requestType = requestType;
   }
 
-  public CNodeServerType getCnodeServerType() {
-    return cnodeCNodeServerType;
+  public CNodeServerType getCnServerType() {
+    return cnServerType;
   }
 
-  public void setCnodeServerType(CNodeServerType cnodeCNodeServerType) {
-    this.cnodeCNodeServerType = cnodeCNodeServerType;
+  public void setCnServerType(CNodeServerType cnodeCNodeServerType) {
+    this.cnServerType = cnodeCNodeServerType;
   }
 
-  public int getCnodeSelectorNum() {
-    return cnodeSelectorNum;
+  public int getCnSelectorNum() {
+    return cnSelectorNum;
   }
 
-  public void setCnodeSelectorNum(int cnodeSelectorNum) {
-    this.cnodeSelectorNum = cnodeSelectorNum;
+  public void setCnSelectorNum(int cnSelectorNum) {
+    this.cnSelectorNum = cnSelectorNum;
   }
 
-  public int getCnodeMaxThreadPoolSize() {
-    return cnodeMaxThreadPoolSize;
+  public int getCnMaxThreadPoolSize() {
+    return cnMaxThreadPoolSize;
   }
 
-  public void setCnodeMaxThreadPoolSize(int cnodeMaxThreadPoolSize) {
-    this.cnodeMaxThreadPoolSize = cnodeMaxThreadPoolSize;
+  public void setCnMaxThreadPoolSize(int cnMaxThreadPoolSize) {
+    this.cnMaxThreadPoolSize = cnMaxThreadPoolSize;
   }
 
-  public int getDnodeRequestNum() {
-    return dnodeRequestNum;
+  public int getDnRequestNum() {
+    return dnRequestNum;
   }
 
-  public void setDnodeRequestNum(int dnodeRequestNum) {
-    this.dnodeRequestNum = dnodeRequestNum;
+  public void setDnRequestNum(int dnRequestNum) {
+    this.dnRequestNum = dnRequestNum;
   }
 
-  public int getDnodeConcurrentClientNum() {
-    return dnodeConcurrentClientNum;
+  public int getDnConcurrentClientNum() {
+    return dnConcurrentClientNum;
   }
 
-  public void setDnodeConcurrentClientNum(int dnodeConcurrentClientNum) {
-    this.dnodeConcurrentClientNum = dnodeConcurrentClientNum;
+  public void setDnConcurrentClientNum(int dnConcurrentClientNum) {
+    this.dnConcurrentClientNum = dnConcurrentClientNum;
   }
 
 }

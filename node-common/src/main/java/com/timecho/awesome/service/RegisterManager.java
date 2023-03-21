@@ -19,7 +19,7 @@
 
 package com.timecho.awesome.service;
 
-import com.timecho.awesome.thrift.IService;
+import com.timecho.awesome.exception.StartupException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,7 +37,7 @@ public class RegisterManager {
   }
 
   /** Register service. */
-  public void register(IService service) {
+  public void register(IService service) throws StartupException {
     for (IService s : iServices) {
       if (s.getID() == service.getID()) {
         LOGGER.debug("{} has already been registered. skip", service.getID().getName());

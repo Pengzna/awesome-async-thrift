@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package com.timecho.awesome.thrift;
+package com.timecho.awesome.service;
 
 import com.timecho.awesome.conf.NodeConstant;
 import org.slf4j.Logger;
@@ -87,5 +87,32 @@ public class JMXService implements IService {
   @Override
   public void stop() {
     // Do nothing.
+  }
+
+  public enum ServiceType {
+
+    JMX_SERVICE("JMXService", "JMXService"),
+    CNODE_SERVICE("CNodeRPCService", "CNodeRPCService"),
+    DNODE_SERVICE("DNodeRPCService", "DNodeRPCService");
+
+    private final String name;
+    private final String jmxName;
+
+    ServiceType(String name, String jmxName) {
+      this.name = name;
+      this.jmxName = jmxName;
+    }
+
+    public String getName() {
+      return name;
+    }
+
+    public String getJmxName() {
+      return jmxName;
+    }
+
+    private static String generateJmxName(String packageName, String jmxName) {
+      return String.format("%s:type=%s", packageName, jmxName);
+    }
   }
 }

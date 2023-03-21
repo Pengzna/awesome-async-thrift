@@ -19,23 +19,25 @@
 
 package com.timecho.awesome.conf;
 
+import java.util.concurrent.TimeUnit;
+
 public class NodeConstant {
 
   public static final String REQUEST_TYPE = "request_type";
 
-  public static final String CNODE_RPC_ADDRESS = "cnode_rpc_address";
-  public static final String CNODE_RPC_PORT = "cnode_rpc_port";
-  public static final String CNODE_SERVER_TYPE = "cnode_server_type";
-  public static final String CNODE_SELECTOR_NUM = "cnode_selector_num";
-  public static final String CNODE_MAX_THREAD_POOL_SIZE = "cnode_max_thread_pool_size";
+  public static final String CN_RPC_ADDRESS = "cn_rpc_address";
+  public static final String CN_RPC_PORT = "cn_rpc_port";
+  public static final String CN_SERVER_TYPE = "cn_server_type";
+  public static final String CN_SELECTOR_NUM = "cn_selector_num";
+  public static final String CN_MAX_THREAD_POOL_SIZE = "cn_max_thread_pool_size";
 
-  public static final String DNODE_RPC_ADDRESS = "dnode_rpc_address";
-  public static final String DNODE_RPC_PORT = "dnode_rpc_port";
-  public static final String DNODE_REQUEST_NUM = "dnode_request_num";
-  public static final String DNODE_CONCURRENT_CLIENT_NUM = "dnode_concurrent_client_num";
+  public static final String DN_RPC_ADDRESS = "dn_rpc_address";
+  public static final String DN_RPC_PORT = "dn_rpc_port";
+  public static final String DN_REQUEST_NUM = "dn_request_num";
+  public static final String DN_MAX_CONCURRENT_CLIENT_NUM = "dn_max_concurrent_client_num";
 
-  public static final String CNODE = "CNODE";
-  public static final String DNODE = "DNODE";
+  public static final String CNODE = "CNode";
+  public static final String DNODE = "DNode";
 
   public static final String CNODE_HOME = "CNODE_HOME";
   public static final String CNODE_CONF = "CNODE_CONF";
@@ -45,6 +47,8 @@ public class NodeConstant {
   public static final String DNODE_CONF = "DNODE_CONF";
   public static final String DNODE_CONFIG_FILE_NAME = "dnode.properties";
 
+  public static final int CONNECTION_TIMEOUT_IN_MS = (int) TimeUnit.SECONDS.toMillis(20);
+  public static final boolean ENABLE_THRIFT_COMPRESSION = false;
   public static final int THRIFT_DEFAULT_BUF_CAPACITY = 1024;
   public static final int THRIFT_FRAME_MAX_SIZE = 536870912;
   public static final int MAX_BUFFER_OVERSIZE_TIME = 5;

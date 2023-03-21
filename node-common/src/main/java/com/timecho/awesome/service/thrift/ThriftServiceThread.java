@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package com.timecho.awesome.thrift;
+package com.timecho.awesome.service.thrift;
 
 import com.timecho.awesome.rpc.RpcTransportFactory;
 import org.apache.thrift.TBaseAsyncProcessor;

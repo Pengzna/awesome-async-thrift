@@ -23,61 +23,55 @@ import com.timecho.aweseme.thrift.IDNodeRPCService;
 import com.timecho.awesome.conf.DNodeConfig;
 import com.timecho.awesome.conf.DNodeDescriptor;
 import com.timecho.awesome.conf.NodeConstant;
-import com.timecho.awesome.thrift.ServiceType;
-import com.timecho.awesome.thrift.ThriftService;
-import com.timecho.awesome.thrift.ThriftServiceThread;
+import com.timecho.awesome.service.JMXService;
 
 public class DNodeRPCService extends ThriftService implements DNodeRPCServiceMBean {
 
   private static final DNodeConfig CONF = DNodeDescriptor.getInstance().getConf();
 
-  private final DNodeRPCServiceProcessor dNodeRPCServiceProcessor;
+  private final DNodeRPCServiceProcessor dnProcessor;
 
   public DNodeRPCService() {
-    this.dNodeRPCServiceProcessor = new DNodeRPCServiceProcessor();
+    this.dnProcessor = new DNodeRPCServiceProcessor();
     super.mbeanName =
       String.format(
         "%s:%s=%s", this.getClass().getPackage(), NodeConstant.JMX_TYPE, getID().getJmxName());
-    super.initSyncServiceImpl(this.dNodeRPCServiceProcessor);
+    super.initSyncServiceImpl();
   }
 
   @Override
-  public ServiceType getID() {
-    return ServiceType.DNODE_SERVICE;
+  public JMXService.ServiceType getID() {
+    return JMXService.ServiceType.DNODE_SERVICE;
   }
 
   @Override
   public void initTProcessor() {
-    processor = new IDNodeRPCService.Processor<>(dNodeRPCServiceProcessor);
+    processor = new IDNodeRPCService.Processor<>(dnProcessor);
   }
 
   @Override
-  public void initThriftServiceThread() throws IllegalAccessException {
-    try {
-      thriftServiceThread =
-        new ThriftServiceThread(
-          processor,
-          getID().getName(),
-          ServiceType.DNODE_SERVICE.getName(),
-          getBindIP(),
-          getBindPort(),
-          configConf.getCnRpcMaxConcurrentClientNum(),
-          configConf.getThriftServerAwaitTimeForStopService(),
-          new ConfigNodeRPCServiceHandler(),
-          commonConfig.isRpcThriftCompressionEnabled());
-    } catch (RPCServiceException e) {
-      throw new IllegalAccessException(e.getMessage());
-    }
-    thriftServiceThread.setName(ServiceType.DNODE_SERVICE.getName());
+  public void initThriftServiceThread() {
+    thriftServiceThread =
+      new ThriftServiceThread(
+        processor,
+        getID().getName(),
+        JMXService.ServiceType.DNODE_SERVICE.getName(),
+        getBindIP(),
+        getBindPort(),
+        CONF.getDnMaxConcurrentClientNum(),
+        CONF.getDnThriftServerAwaitTimeForStopService(),
+        new DNodeRPCServiceHandler(),
+        CONF.isDnRpcThriftCompressionEnabled());
+    thriftServiceThread.setName(JMXService.ServiceType.DNODE_SERVICE.getName());
   }
 
   @Override
   public String getBindIP() {
-    return CONF.getDnodeRpcAddress();
+    return CONF.getDnRpcAddress();
   }
 
   @Override
   public int getBindPort() {
-    return CONF.getDnodeRpcPort();
+    return CONF.getDnRpcPort();
   }
 }

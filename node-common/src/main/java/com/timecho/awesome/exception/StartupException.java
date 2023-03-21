@@ -17,31 +17,12 @@
  * under the License.
  */
 
-package com.timecho.awesome.thrift;
+package com.timecho.awesome.exception;
 
-public enum ServiceType {
+public class StartupException extends Exception {
 
-  JMX_SERVICE("JMXService", "JMXService"),
-  CNODE_SERVICE("CNodeRPCService", "CNodeRPCService"),
-  DNODE_SERVICE("DNodeRPCService", "DNodeRPCService");
-
-  private final String name;
-  private final String jmxName;
-
-  ServiceType(String name, String jmxName) {
-    this.name = name;
-    this.jmxName = jmxName;
-  }
-
-  public String getName() {
-    return name;
-  }
-
-  public String getJmxName() {
-    return jmxName;
-  }
-
-  private static String generateJmxName(String packageName, String jmxName) {
-    return String.format("%s:type=%s", packageName, jmxName);
+  public StartupException(String name, String message) {
+    super(
+      String.format("Failed to start [%s], because [%s]", name, message));
   }
 }

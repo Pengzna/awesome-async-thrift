@@ -17,8 +17,10 @@
  * under the License.
  */
 
-package com.timecho.awesome.thrift;
+package com.timecho.awesome.service.thrift;
 
+import com.timecho.awesome.concurrent.ThreadPoolFactory;
+import com.timecho.awesome.exception.RPCServiceException;
 import org.apache.thrift.TBaseAsyncProcessor;
 import org.apache.thrift.TProcessor;
 import org.apache.thrift.protocol.TBinaryProtocol;
@@ -74,7 +76,6 @@ public abstract class AbstractThriftServiceThread extends Thread {
   }
 
   /** For async ThriftService. */
-  @SuppressWarnings("squid:S107")
   protected AbstractThriftServiceThread(
     TBaseAsyncProcessor<?> processor,
     String serviceName,
@@ -122,7 +123,7 @@ public abstract class AbstractThriftServiceThread extends Thread {
     poolArgs.maxReadBufferBytes = maxReadBufferBytes;
     poolArgs.selectorThreads(selectorThreads);
     executorService =
-      IoTDBThreadPoolFactory.createThriftRpcClientThreadPool(
+      ThreadPoolFactory.createThriftRpcClientThreadPool(
         minWorkerThreads, maxWorkerThreads, timeoutSecond, TimeUnit.SECONDS, threadsName);
     poolArgs.executorService(executorService);
     poolArgs.processor(processor);
@@ -132,7 +133,6 @@ public abstract class AbstractThriftServiceThread extends Thread {
   }
 
   /** For sync ThriftServiceThread */
-  @SuppressWarnings("squid:S107")
   protected AbstractThriftServiceThread(
     TProcessor processor,
     String serviceName,
@@ -164,7 +164,7 @@ public abstract class AbstractThriftServiceThread extends Thread {
       .maxWorkerThreads(maxWorkerThreads)
       .minWorkerThreads(Runtime.getRuntime().availableProcessors())
       .stopTimeoutVal(timeoutSecond);
-    executorService = IoTDBThreadPoolFactory.createThriftRpcClientThreadPool(poolArgs, threadsName);
+    executorService = ThreadPoolFactory.createThriftRpcClientThreadPool(poolArgs, threadsName);
     poolArgs.executorService = executorService;
     poolArgs.processor(processor);
     poolArgs.protocolFactory(protocolFactory);
@@ -172,7 +172,6 @@ public abstract class AbstractThriftServiceThread extends Thread {
     return poolArgs;
   }
 
-  @SuppressWarnings("java:S2259")
   private TServerTransport openTransport(String bindAddress, int port) throws TTransportException {
     return new TServerSocket(new InetSocketAddress(bindAddress, port));
   }
@@ -187,7 +186,6 @@ public abstract class AbstractThriftServiceThread extends Thread {
     this.threadStopLatch = threadStopLatch;
   }
 
-  @SuppressWarnings("squid:S2093") // socket will be used later
   @Override
   public void run() {
     LOGGER.info("The {} service thread begin to run...", serviceName);
@@ -195,7 +193,7 @@ public abstract class AbstractThriftServiceThread extends Thread {
       poolServer.serve();
     } catch (Exception e) {
       throw new RPCServiceException(
-        String.format("%s: %s exit, because ", IoTDBConstant.GLOBAL_DB_NAME, serviceName), e);
+        String.format("%s exit, because ", serviceName), e);
     } finally {
       close();
       if (threadStopLatch == null) {
@@ -208,8 +206,7 @@ public abstract class AbstractThriftServiceThread extends Thread {
         threadStopLatch.countDown();
       }
       LOGGER.debug(
-        "{}: close TThreadPoolServer and TServerSocket for {}",
-        IoTDBConstant.GLOBAL_DB_NAME,
+        "Close TThreadPoolServer and TServerSocket for {}",
         serviceName);
     }
   }
@@ -225,12 +222,11 @@ public abstract class AbstractThriftServiceThread extends Thread {
       threadStopLatch.countDown();
     }
     LOGGER.debug(
-      "{}: close TThreadPoolServer and TServerSocket for {}",
-      IoTDBConstant.GLOBAL_DB_NAME,
+      "Close TThreadPoolServer and TServerSocket for {}",
       serviceName);
     throw new RPCServiceException(
       String.format(
-        "%s: failed to start %s, because ", IoTDBConstant.GLOBAL_DB_NAME, serviceName),
+        "Failed to start %s, because ", serviceName),
       e);
   }
 
@@ -255,12 +251,5 @@ public abstract class AbstractThriftServiceThread extends Thread {
       return poolServer.isServing();
     }
     return false;
-  }
-
-  public long getActiveThreadCount() {
-    if (executorService != null) {
-      return ((WrappedThreadPoolExecutor) executorService).getActiveCount();
-    }
-    return -1;
   }
 }

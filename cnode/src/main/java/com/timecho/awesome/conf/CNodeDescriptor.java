@@ -54,12 +54,12 @@ public class CNodeDescriptor {
 
       conf.setRequestType(RequestType.parse(properties.getProperty(NodeConstant.REQUEST_TYPE)));
 
-      conf.setCnodeServerType(CNodeServerType.parse(properties.getProperty(NodeConstant.CNODE_SERVER_TYPE)));
-      conf.setCnodeSelectorNum(Integer.parseInt(properties.getProperty(NodeConstant.CNODE_SELECTOR_NUM)));
-      conf.setCnodeMaxThreadPoolSize(Integer.parseInt(properties.getProperty(NodeConstant.CNODE_MAX_THREAD_POOL_SIZE)));
+      conf.setCnServerType(CNodeServerType.parse(properties.getProperty(NodeConstant.CN_SERVER_TYPE)));
+      conf.setCnSelectorNum(Integer.parseInt(properties.getProperty(NodeConstant.CN_SELECTOR_NUM)));
+      conf.setCnMaxThreadPoolSize(Integer.parseInt(properties.getProperty(NodeConstant.CN_MAX_THREAD_POOL_SIZE)));
 
-      conf.setDnodeRequestNum(Integer.parseInt(properties.getProperty(NodeConstant.DNODE_REQUEST_NUM)));
-      conf.setDnodeConcurrentClientNum(Integer.parseInt(properties.getProperty(NodeConstant.DNODE_CONCURRENT_CLIENT_NUM)));
+      conf.setDnRequestNum(Integer.parseInt(properties.getProperty(NodeConstant.DN_REQUEST_NUM)));
+      conf.setDnConcurrentClientNum(Integer.parseInt(properties.getProperty(NodeConstant.DN_MAX_CONCURRENT_CLIENT_NUM)));
 
     } catch (IOException | ConfigurationException e) {
       LOGGER.warn("Error occurs when loading config file, use default config.", e);

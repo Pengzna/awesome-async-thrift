@@ -17,14 +17,18 @@
  * under the License.
  */
 
-package com.timecho.awesome.thrift;
+package com.timecho.awesome.service.thrift;
 
+import com.timecho.awesome.exception.StartupException;
+import com.timecho.awesome.service.IService;
+import com.timecho.awesome.service.JMXService;
 import org.apache.thrift.TProcessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 public abstract class ThriftService implements IService {
 
@@ -59,7 +63,7 @@ public abstract class ThriftService implements IService {
   }
 
   @Override
-  public void start() {
+  public void start() throws StartupException {
     JMXService.registerMBean(this, mbeanName);
     startService();
   }
@@ -73,11 +77,11 @@ public abstract class ThriftService implements IService {
   boolean setSyncImpl = false;
   boolean setAsyncImpl = false;
 
-  public void initSyncServiceImpl(Object serviceImpl) {
+  public void initSyncServiceImpl() {
     setSyncImpl = true;
   }
 
-  public void initAsyncServiceImpl(Object serviceImpl) {
+  public void initAsyncServiceImpl() {
     setAsyncImpl = true;
   }
 
@@ -92,22 +96,20 @@ public abstract class ThriftService implements IService {
 
   public abstract int getBindPort();
 
-  @SuppressWarnings("squid:S2276")
   public void startService() throws StartupException {
     if (STATUS_UP.equals(getRPCServiceStatus())) {
       LOGGER.info(
-        "{}: {} has been already running now",
-        IoTDBConstant.GLOBAL_DB_NAME,
+        "{} has been already running now",
         this.getID().getName());
       return;
     }
-    LOGGER.info("{}: start {}...", IoTDBConstant.GLOBAL_DB_NAME, this.getID().getName());
+    LOGGER.info("Start {}...", this.getID().getName());
     try {
       reset();
       initTProcessor();
       if (!setSyncImpl && !setAsyncImpl) {
         throw new StartupException(
-          getID().getName(), "At least one service implementataion should be set.");
+          getID().getName(), "At least one service implementation should be set.");
       }
       initThriftServiceThread();
       thriftServiceThread.setThreadStopLatch(stopLatch);
@@ -115,7 +117,7 @@ public abstract class ThriftService implements IService {
 
       while (!thriftServiceThread.isServing()) {
         // sleep 100ms for waiting the rpc server start.
-        Thread.sleep(100);
+        TimeUnit.MILLISECONDS.sleep(100);
       }
     } catch (InterruptedException
              | ClassNotFoundException
@@ -128,8 +130,7 @@ public abstract class ThriftService implements IService {
     }
 
     LOGGER.info(
-      "{}: start {} successfully, listening on ip {} port {}",
-      IoTDBConstant.GLOBAL_DB_NAME,
+      "Start {} successfully, listening on ip: {} port: {}",
       this.getID().getName(),
       getBindIP(),
       getBindPort());
@@ -140,17 +141,12 @@ public abstract class ThriftService implements IService {
     stopLatch = new CountDownLatch(1);
   }
 
-  public void restartService() {
-    stopService();
-    startService();
-  }
-
   public void stopService() {
     if (STATUS_DOWN.equals(getRPCServiceStatus())) {
-      LOGGER.info("{}: {} isn't running now", IoTDBConstant.GLOBAL_DB_NAME, this.getID().getName());
+      LOGGER.info("{} isn't running now", this.getID().getName());
       return;
     }
-    LOGGER.info("{}: closing {}...", IoTDBConstant.GLOBAL_DB_NAME, this.getID().getName());
+    LOGGER.info("Closing {}...", this.getID().getName());
     if (thriftServiceThread != null) {
       thriftServiceThread.close();
     }
@@ -158,10 +154,10 @@ public abstract class ThriftService implements IService {
       stopLatch.await();
       reset();
       LOGGER.info(
-        "{}: close {} successfully", IoTDBConstant.GLOBAL_DB_NAME, this.getID().getName());
+        "Close {} successfully", this.getID().getName());
     } catch (InterruptedException e) {
       LOGGER.error(
-        "{}: close {} failed because: ", IoTDBConstant.GLOBAL_DB_NAME, this.getID().getName(), e);
+        "Close {} failed because: ", this.getID().getName(), e);
       Thread.currentThread().interrupt();
     }
   }

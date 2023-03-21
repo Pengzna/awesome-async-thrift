@@ -17,12 +17,14 @@
  * under the License.
  */
 
-package com.timecho.awesome.thrift;
+package com.timecho.awesome.service;
+
+import com.timecho.awesome.exception.StartupException;
 
 public interface IService {
 
   /** Start current service. */
-  void start();
+  void start() throws StartupException;
 
   /**
    * Stop current service. If current service uses thread or thread pool, current service should
@@ -35,5 +37,5 @@ public interface IService {
    *
    * @return current service name
    */
-  ServiceType getID();
+  JMXService.ServiceType getID();
 }
