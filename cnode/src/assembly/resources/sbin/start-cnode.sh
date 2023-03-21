@@ -51,7 +51,7 @@ CLASSPATH=""
 for f in "${CNODE_HOME}"/lib/*.jar; do
   CLASSPATH=${CLASSPATH}":"$f
 done
-classname=com.timecho.awesome.cnode.CNode
+classname=com.timecho.awesome.service.CNode
 
 launch_service() {
     class="$1"

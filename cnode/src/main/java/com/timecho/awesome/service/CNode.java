@@ -27,7 +27,7 @@ import com.timecho.awesome.service.thrift.CNodeRPCService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class CNode {
+public class CNode implements CNodeMBean {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(CNode.class);
   private final String mbeanName =

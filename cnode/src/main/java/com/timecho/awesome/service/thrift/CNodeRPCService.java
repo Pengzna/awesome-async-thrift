@@ -84,9 +84,9 @@ public class CNodeRPCService extends ThriftService implements CNodeRPCServiceMBe
             getBindIP(),
             getBindPort(),
             CONF.getCnMaxConcurrentClientNum(),
-            CONF.getCnThriftServerAwaitTimeForStopService(),
+            NodeConstant.THRIFT_SERVER_AWAIT_TIME_FOR_STOP_SERVICE,
             new CNodeRPCSyncServiceHandler(),
-            CONF.isCnRpcThriftCompressionEnabled());
+            NodeConstant.IS_ENABLE_THRIFT_COMPRESSION);
         break;
       case ASYNC:
       default:
@@ -100,9 +100,9 @@ public class CNodeRPCService extends ThriftService implements CNodeRPCServiceMBe
             CONF.getCnSelectorNum(),
             CONF.getCnMinConcurrentClientNum(),
             CONF.getCnMaxConcurrentClientNum(),
-            CONF.getCnThriftServerAwaitTimeForStopService(),
+            NodeConstant.THRIFT_SERVER_AWAIT_TIME_FOR_STOP_SERVICE,
             new CNodeRPCAsyncServiceHandler((CNodeRPCAsyncServiceProcessor) cnProcessor),
-            NodeConstant.ENABLE_THRIFT_COMPRESSION,
+            NodeConstant.IS_ENABLE_THRIFT_COMPRESSION,
             NodeConstant.CONNECTION_TIMEOUT_IN_MS,
             NodeConstant.THRIFT_FRAME_MAX_SIZE);
         break;

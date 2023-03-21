@@ -17,36 +17,11 @@
  * under the License.
  */
 
-package com.timecho.awesome.conf;
+package com.timecho.awesome.exception;
 
-public class DNodeConfig {
+public class BadNodeUrlException extends Exception {
 
-  private String dnRpcAddress = "127.0.0.1";
-  private int dnRpcPort = 6667;
-
-  private int dnMaxConcurrentClientNum = 65535;
-
-  public String getDnRpcAddress() {
-    return dnRpcAddress;
-  }
-
-  public void setDnRpcAddress(String dnRpcAddress) {
-    this.dnRpcAddress = dnRpcAddress;
-  }
-
-  public int getDnRpcPort() {
-    return dnRpcPort;
-  }
-
-  public void setDnRpcPort(int dnRpcPort) {
-    this.dnRpcPort = dnRpcPort;
-  }
-
-  public int getDnMaxConcurrentClientNum() {
-    return dnMaxConcurrentClientNum;
-  }
-
-  public void setDnMaxConcurrentClientNum(int dnMaxConcurrentClientNum) {
-    this.dnMaxConcurrentClientNum = dnMaxConcurrentClientNum;
+  public BadNodeUrlException(String nodeUrl) {
+    super(String.format("Bad node url: %s", nodeUrl));
   }
 }

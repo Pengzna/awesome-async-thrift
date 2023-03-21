@@ -32,8 +32,15 @@ public class DNodeDescriptor {
       Properties properties = new Properties();
       properties.load(inputStream);
 
-      conf.setDnRpcAddress(properties.getProperty(NodeConstant.DN_RPC_ADDRESS));
-      conf.setDnRpcPort(Integer.parseInt(properties.getProperty(NodeConstant.DN_RPC_PORT)));
+      conf.setDnRpcAddress(
+        properties
+          .getProperty(NodeConstant.DN_RPC_ADDRESS, conf.getDnRpcAddress())
+          .trim());
+      conf.setDnRpcPort(
+        Integer.parseInt(
+          properties
+            .getProperty(NodeConstant.DN_RPC_PORT, String.valueOf(conf.getDnRpcPort()))
+            .trim()));
 
     } catch (IOException e) {
       LOGGER.warn("Error occurs when loading config file, use default config.", e);

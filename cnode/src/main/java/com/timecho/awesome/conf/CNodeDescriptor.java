@@ -19,7 +19,9 @@
 
 package com.timecho.awesome.conf;
 
+import com.timecho.awesome.exception.BadNodeUrlException;
 import com.timecho.awesome.exception.ConfigurationException;
+import com.timecho.awesome.utils.NodeUrlUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,14 +54,56 @@ public class CNodeDescriptor {
       Properties properties = new Properties();
       properties.load(inputStream);
 
-      conf.setRequestType(RequestType.parse(properties.getProperty(NodeConstant.REQUEST_TYPE)));
+      conf.setCnRpcAddress(
+        properties
+          .getProperty(NodeConstant.CN_RPC_ADDRESS, conf.getCnRpcAddress())
+          .trim());
 
-      conf.setCnServerType(CNodeServerType.parse(properties.getProperty(NodeConstant.CN_SERVER_TYPE)));
-      conf.setCnSelectorNum(Integer.parseInt(properties.getProperty(NodeConstant.CN_SELECTOR_NUM)));
-      conf.setCnMaxThreadPoolSize(Integer.parseInt(properties.getProperty(NodeConstant.CN_MAX_THREAD_POOL_SIZE)));
+      conf.setCnRpcPort(
+        Integer.parseInt(
+          properties
+            .getProperty(
+              NodeConstant.CN_RPC_PORT, String.valueOf(conf.getCnRpcPort()))
+            .trim()));
 
-      conf.setDnRequestNum(Integer.parseInt(properties.getProperty(NodeConstant.DN_REQUEST_NUM)));
+      String dnUrls = properties.getProperty(NodeConstant.WORKER_DN_LIST);
+      if (dnUrls != null) {
+        try {
+          conf.setWorkerDnList(NodeUrlUtils.parseTEndPointUrls(dnUrls));
+        } catch (BadNodeUrlException e) {
+          throw new ConfigurationException(e.getMessage());
+        }
+      }
+
+      conf.setRequestType(
+        RequestType.parse(
+          properties
+            .getProperty(NodeConstant.REQUEST_TYPE, conf.getRequestType().getRequestType())
+            .trim()));
+
+      conf.setCnServerType(
+        CNodeServerType.parse(
+          properties
+            .getProperty(NodeConstant.CN_SERVER_TYPE, conf.getCnServerType().getServerType())
+            .trim()));
+
+      conf.setCnSelectorNum(
+        Integer.parseInt(
+          properties
+            .getProperty(NodeConstant.CN_SELECTOR_NUM, String.valueOf(conf.getCnSelectorNum()))
+            .trim()));
+
+      conf.setDnRequestNum(
+        Integer.parseInt(
+          properties
+            .getProperty(NodeConstant.DN_REQUEST_NUM, String.valueOf(conf.getDnRequestNum()))
+            .trim()));
+
+
       conf.setDnConcurrentClientNum(Integer.parseInt(properties.getProperty(NodeConstant.DN_MAX_CONCURRENT_CLIENT_NUM)));
+
+
+      conf.setCnMaxThreadPoolSize(Integer.parseInt(properties.getProperty(NodeConstant.CN_MAX_THREAD_POOL_SIZE)));
 
     } catch (IOException | ConfigurationException e) {
       LOGGER.warn("Error occurs when loading config file, use default config.", e);

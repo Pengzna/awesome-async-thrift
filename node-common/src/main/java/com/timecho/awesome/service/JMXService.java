@@ -80,7 +80,7 @@ public class JMXService implements IService {
   public void start() {
     String jmxPort = System.getProperty(NodeConstant.JMX_PORT);
     if (jmxPort == null) {
-      LOGGER.debug("{} JMX port is undefined", this.getID().getName());
+      LOGGER.warn("{} JMX port is undefined", this.getID().getName());
     }
   }
 

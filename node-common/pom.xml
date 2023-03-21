@@ -43,6 +43,11 @@
             <version>0.16.0</version>
         </dependency>
         <dependency>
+            <groupId>com.timecho.awesome</groupId>
+            <artifactId>thrift-core</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
             <groupId>org.xerial.snappy</groupId>
             <artifactId>snappy-java</artifactId>
             <version>1.1.8.4</version>

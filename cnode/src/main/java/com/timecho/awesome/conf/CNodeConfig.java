@@ -19,24 +19,36 @@
 
 package com.timecho.awesome.conf;
 
+import com.timecho.aweseme.thrift.TEndPoint;
+
+import java.util.Collections;
+import java.util.List;
+
 public class CNodeConfig {
 
   private String cnRpcAddress = "127.0.0.1";
   private int cnRpcPort = 10710;
 
+  private List<TEndPoint> workerDnList =
+    Collections.singletonList(new TEndPoint("127.0.0.1", 6667));
+
+
   private RequestType requestType = RequestType.IO;
 
   private CNodeServerType cnServerType = CNodeServerType.ASYNC;
   private int cnSelectorNum = 4;
-  private int cnMaxThreadPoolSize = 65535;
+
+  private int dnRequestNum = 1000;
+
+
 
   private int cnMinConcurrentClientNum = Runtime.getRuntime().availableProcessors();
   private int cnMaxConcurrentClientNum = 65535;
-  private int cnThriftServerAwaitTimeForStopService = 60;
-  private boolean cnRpcThriftCompressionEnabled = false;
 
-  private int dnRequestNum = 300;
   private int dnConcurrentClientNum = 65535;
+
+
+  private int cnMaxThreadPoolSize = 65535;
 
   public int getCnMinConcurrentClientNum() {
     return cnMinConcurrentClientNum;
@@ -52,22 +64,6 @@ public class CNodeConfig {
 
   public void setCnMaxConcurrentClientNum(int cnMaxConcurrentClientNum) {
     this.cnMaxConcurrentClientNum = cnMaxConcurrentClientNum;
-  }
-
-  public int getCnThriftServerAwaitTimeForStopService() {
-    return cnThriftServerAwaitTimeForStopService;
-  }
-
-  public void setCnThriftServerAwaitTimeForStopService(int cnThriftServerAwaitTimeForStopService) {
-    this.cnThriftServerAwaitTimeForStopService = cnThriftServerAwaitTimeForStopService;
-  }
-
-  public boolean isCnRpcThriftCompressionEnabled() {
-    return cnRpcThriftCompressionEnabled;
-  }
-
-  public void setCnRpcThriftCompressionEnabled(boolean cnRpcThriftCompressionEnabled) {
-    this.cnRpcThriftCompressionEnabled = cnRpcThriftCompressionEnabled;
   }
 
   public String getCnRpcAddress() {
@@ -134,4 +130,11 @@ public class CNodeConfig {
     this.dnConcurrentClientNum = dnConcurrentClientNum;
   }
 
+  public List<TEndPoint> getWorkerDnList() {
+    return workerDnList;
+  }
+
+  public void setWorkerDnList(List<TEndPoint> workerDnList) {
+    this.workerDnList = workerDnList;
+  }
 }

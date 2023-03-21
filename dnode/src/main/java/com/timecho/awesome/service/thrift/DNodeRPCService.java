@@ -59,9 +59,9 @@ public class DNodeRPCService extends ThriftService implements DNodeRPCServiceMBe
         getBindIP(),
         getBindPort(),
         CONF.getDnMaxConcurrentClientNum(),
-        CONF.getDnThriftServerAwaitTimeForStopService(),
+        NodeConstant.THRIFT_SERVER_AWAIT_TIME_FOR_STOP_SERVICE,
         new DNodeRPCServiceHandler(),
-        CONF.isDnRpcThriftCompressionEnabled());
+        NodeConstant.IS_ENABLE_THRIFT_COMPRESSION);
     thriftServiceThread.setName(JMXService.ServiceType.DNODE_SERVICE.getName());
   }
 
