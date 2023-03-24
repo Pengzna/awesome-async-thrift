@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package com.timelab.awesome.client.property;
+package com.timecho.awesome.client.property;
 
 import java.time.Duration;
 import java.util.concurrent.TimeUnit;

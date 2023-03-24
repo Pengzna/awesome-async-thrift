@@ -17,25 +17,19 @@
  * under the License.
  */
 
-package com.timecho.awesome.service.thrift;
+package com.timecho.awesome.concurrent;
 
-import com.timecho.aweseme.thrift.ICNodeRPCService;
-import com.timecho.awesome.client.AsyncDNodeClientPool;
+public enum ThreadName {
 
-public class CNodeRPCSyncServiceProcessor implements ICNodeRPCService.Iface {
+  ASYNC_DNODE_CLIENT_POOL("AsyncDNodeClientPool");
 
-  @Override
-  public long cpuRequest(long n) {
-    long z = 0;
-    for (int i = 0; i < n; i++) {
-      z += i;
-    }
-    return z;
+  private final String name;
+
+  ThreadName(String name) {
+    this.name = name;
   }
 
-  @Override
-  public boolean ioRequest() {
-    AsyncDNodeClientPool.getInstance().processIORequest();
-    return true;
+  public String getName() {
+    return name;
   }
 }

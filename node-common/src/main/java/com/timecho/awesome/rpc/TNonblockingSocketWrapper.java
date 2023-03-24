@@ -17,36 +17,41 @@
  * under the License.
  */
 
-package com.timelab.awesome.client;
+package com.timecho.awesome.rpc;
 
-import com.timecho.aweseme.thrift.ICNodeRPCService;
-import com.timecho.aweseme.thrift.TEndPoint;
-import java.io.IOException;
-import org.apache.thrift.async.TAsyncClientManager;
-import org.apache.thrift.protocol.TProtocolFactory;
 import org.apache.thrift.transport.TNonblockingSocket;
 import org.apache.thrift.transport.TTransportException;
 
-public class AsyncServiceClient extends ICNodeRPCService.AsyncClient {
+import java.io.IOException;
+import java.nio.channels.SocketChannel;
 
-  private static final int CONNECTION_TIMEOUT = 20_000;
+/**
+ * In Thrift 0.14.1, TNonblockingSocket's constructor throws a never-happened exception. So, we
+ * screen the exception https://issues.apache.org/jira/browse/THRIFT-5412
+ */
+public class TNonblockingSocketWrapper {
 
-  private final TEndPoint endpoint;
-  private final ClientManager clientManager;
-
-  public AsyncServiceClient(TProtocolFactory protocolFactory,
-      TAsyncClientManager clientManager,
-      TEndPoint endpoint,
-      ClientManager clientManager1) throws IOException {
-    super(protocolFactory, clientManager, wrapper(endpoint.getIp(), endpoint.getPort()));
-    this.endpoint = endpoint;
-    this.clientManager = clientManager1;
+  public static TNonblockingSocket wrap(String host, int port) throws IOException {
+    try {
+      return new TNonblockingSocket(host, port);
+    } catch (TTransportException e) {
+      // never happen
+      return null;
+    }
   }
 
-
-  private static TNonblockingSocket wrapper(String host, int port) throws IOException {
+  public static TNonblockingSocket wrap(String host, int port, int timeout) throws IOException {
     try {
-      return new TNonblockingSocket(host, port, CONNECTION_TIMEOUT);
+      return new TNonblockingSocket(host, port, timeout);
+    } catch (TTransportException e) {
+      // never happen
+      return null;
+    }
+  }
+
+  public static TNonblockingSocket wrap(SocketChannel socketChannel) throws IOException {
+    try {
+      return new TNonblockingSocket(socketChannel);
     } catch (TTransportException e) {
       // never happen
       return null;

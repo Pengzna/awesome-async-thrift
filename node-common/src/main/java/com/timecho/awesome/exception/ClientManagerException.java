@@ -17,25 +17,15 @@
  * under the License.
  */
 
-package com.timecho.awesome.service.thrift;
+package com.timecho.awesome.exception;
 
-import com.timecho.aweseme.thrift.ICNodeRPCService;
-import com.timecho.awesome.client.AsyncDNodeClientPool;
+public class ClientManagerException extends Exception {
 
-public class CNodeRPCSyncServiceProcessor implements ICNodeRPCService.Iface {
-
-  @Override
-  public long cpuRequest(long n) {
-    long z = 0;
-    for (int i = 0; i < n; i++) {
-      z += i;
-    }
-    return z;
+  public ClientManagerException(Exception exception) {
+    super(exception);
   }
 
-  @Override
-  public boolean ioRequest() {
-    AsyncDNodeClientPool.getInstance().processIORequest();
-    return true;
+  public ClientManagerException(String message) {
+    super(message);
   }
 }

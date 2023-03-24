@@ -17,11 +17,13 @@
  * under the License.
  */
 
-package com.timelab.awesome.client.exception;
+package com.timecho.awesome.exception;
 
-public class CreateTAsyncClientManagerException extends RuntimeException {
+public class BorrowNullClientManagerException extends ClientManagerException {
 
-  public CreateTAsyncClientManagerException(String message, Throwable cause) {
-    super(message, cause);
+  private static final String MESSAGE = "Can not borrow client for node null";
+
+  public BorrowNullClientManagerException() {
+    super(MESSAGE);
   }
 }

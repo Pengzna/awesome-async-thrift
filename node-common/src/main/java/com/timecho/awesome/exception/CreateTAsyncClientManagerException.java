@@ -17,11 +17,11 @@
  * under the License.
  */
 
-include "common.thrift"
+package com.timecho.awesome.exception;
 
-namespace java com.timecho.aweseme.thrift
+public class CreateTAsyncClientManagerException extends RuntimeException {
 
-service IDNodeRPCService {
-
-  void activateDNode(common.TDNodeConfiguration configuration)
+  public CreateTAsyncClientManagerException(String message, Throwable cause) {
+    super(message, cause);
+  }
 }

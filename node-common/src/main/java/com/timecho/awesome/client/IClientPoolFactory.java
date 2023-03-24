@@ -17,25 +17,18 @@
  * under the License.
  */
 
-package com.timecho.awesome.service.thrift;
+package com.timecho.awesome.client;
 
-import com.timecho.aweseme.thrift.ICNodeRPCService;
-import com.timecho.awesome.client.AsyncDNodeClientPool;
+import org.apache.commons.pool2.KeyedObjectPool;
 
-public class CNodeRPCSyncServiceProcessor implements ICNodeRPCService.Iface {
+public interface IClientPoolFactory<K, V> {
 
-  @Override
-  public long cpuRequest(long n) {
-    long z = 0;
-    for (int i = 0; i < n; i++) {
-      z += i;
-    }
-    return z;
-  }
-
-  @Override
-  public boolean ioRequest() {
-    AsyncDNodeClientPool.getInstance().processIORequest();
-    return true;
-  }
+  /**
+   * We can implement this interface in other modules and then set the corresponding expected
+   * parameters and client factory classes.
+   *
+   * @param manager the reference to the clientManager
+   * @return A concurrency safe object pool
+   */
+  KeyedObjectPool<K, V> createClientPool(ClientManager<K, V> manager);
 }

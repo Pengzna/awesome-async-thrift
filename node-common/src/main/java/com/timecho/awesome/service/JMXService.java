@@ -20,6 +20,7 @@
 package com.timecho.awesome.service;
 
 import com.timecho.awesome.conf.NodeConstant;
+import com.timecho.awesome.conf.ServiceType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -89,30 +90,4 @@ public class JMXService implements IService {
     // Do nothing.
   }
 
-  public enum ServiceType {
-
-    JMX_SERVICE("JMXService", "JMXService"),
-    CNODE_SERVICE("CNodeRPCService", "CNodeRPCService"),
-    DNODE_SERVICE("DNodeRPCService", "DNodeRPCService");
-
-    private final String name;
-    private final String jmxName;
-
-    ServiceType(String name, String jmxName) {
-      this.name = name;
-      this.jmxName = jmxName;
-    }
-
-    public String getName() {
-      return name;
-    }
-
-    public String getJmxName() {
-      return jmxName;
-    }
-
-    private static String generateJmxName(String packageName, String jmxName) {
-      return String.format("%s:type=%s", packageName, jmxName);
-    }
-  }
 }

@@ -19,9 +19,11 @@
 
 package com.timecho.awesome.service;
 
+import com.timecho.awesome.client.AsyncDNodeClientPool;
 import com.timecho.awesome.conf.CNodeConfig;
 import com.timecho.awesome.conf.NodeConstant;
 import com.timecho.awesome.conf.CNodeDescriptor;
+import com.timecho.awesome.conf.ServiceType;
 import com.timecho.awesome.exception.StartupException;
 import com.timecho.awesome.service.thrift.CNodeRPCService;
 import org.slf4j.Logger;
@@ -54,18 +56,19 @@ public class CNode implements CNodeMBean {
     }
 
     logConfigurations();
+    AsyncDNodeClientPool.getInstance().activateClusterDNodes();
   }
 
   private void setUpJMXService() throws StartupException {
     registerManager.register(new JMXService());
     JMXService.registerMBean(this, mbeanName);
-    LOGGER.info("Successfully setup {}.", JMXService.ServiceType.JMX_SERVICE.getName());
+    LOGGER.info("Successfully setup {}.", ServiceType.JMX_SERVICE.getName());
   }
 
   private void setUpRPCService() throws StartupException {
     CNodeRPCService cNodeRPCService = new CNodeRPCService(CONF.getCnServerType());
     registerManager.register(cNodeRPCService);
-    LOGGER.info("Successfully setup {}.", JMXService.ServiceType.DNODE_SERVICE.getName());
+    LOGGER.info("Successfully setup {}.", ServiceType.DNODE_SERVICE.getName());
   }
 
   private void logConfigurations() {

@@ -17,13 +17,23 @@
  * under the License.
  */
 
-package com.timelab.awesome.client.exception;
+package com.timecho.awesome.client.factory;
 
-public class BorrowNullClientManagerException extends ClientManagerException {
+import com.timecho.awesome.client.ClientManager;
+import org.apache.commons.pool2.KeyedPooledObjectFactory;
+import org.apache.commons.pool2.PooledObject;
 
-  private static final String MESSAGE = "Can not borrow client for node null";
+public abstract class BaseClientFactory<K, V> implements KeyedPooledObjectFactory<K, V> {
 
-  public BorrowNullClientManagerException() {
-    super(MESSAGE);
+  protected ClientManager<K, V> clientManager;
+
+  protected BaseClientFactory(ClientManager<K, V> clientManager) {
+    this.clientManager = clientManager;
   }
+
+  @Override
+  public void activateObject(K node, PooledObject<V> pooledObject) {}
+
+  @Override
+  public void passivateObject(K node, PooledObject<V> pooledObject) {}
 }

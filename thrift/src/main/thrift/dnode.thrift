@@ -17,15 +17,13 @@
  * under the License.
  */
 
-package com.timelab.awesome.client.exception;
+include "common.thrift"
 
-public class ClientManagerException extends Exception {
+namespace java com.timecho.aweseme.thrift
 
-  public ClientManagerException(Exception exception) {
-    super(exception);
-  }
+service IDNodeRPCService {
 
-  public ClientManagerException(String message) {
-    super(message);
-  }
+  void activateDNode(common.TDNodeConfiguration configuration)
+
+  void processIO()
 }

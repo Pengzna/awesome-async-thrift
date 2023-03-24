@@ -23,7 +23,7 @@ import com.timecho.aweseme.thrift.IDNodeRPCService;
 import com.timecho.awesome.conf.DNodeConfig;
 import com.timecho.awesome.conf.DNodeDescriptor;
 import com.timecho.awesome.conf.NodeConstant;
-import com.timecho.awesome.service.JMXService;
+import com.timecho.awesome.conf.ServiceType;
 
 public class DNodeRPCService extends ThriftService implements DNodeRPCServiceMBean {
 
@@ -40,8 +40,8 @@ public class DNodeRPCService extends ThriftService implements DNodeRPCServiceMBe
   }
 
   @Override
-  public JMXService.ServiceType getID() {
-    return JMXService.ServiceType.DNODE_SERVICE;
+  public ServiceType getID() {
+    return ServiceType.DNODE_SERVICE;
   }
 
   @Override
@@ -55,14 +55,14 @@ public class DNodeRPCService extends ThriftService implements DNodeRPCServiceMBe
       new ThriftServiceThread(
         processor,
         getID().getName(),
-        JMXService.ServiceType.DNODE_SERVICE.getName(),
+        ServiceType.DNODE_SERVICE.getName(),
         getBindIP(),
         getBindPort(),
         CONF.getDnMaxConcurrentClientNum(),
         NodeConstant.THRIFT_SERVER_AWAIT_TIME_FOR_STOP_SERVICE,
         new DNodeRPCServiceHandler(),
         NodeConstant.IS_ENABLE_THRIFT_COMPRESSION);
-    thriftServiceThread.setName(JMXService.ServiceType.DNODE_SERVICE.getName());
+    thriftServiceThread.setName(ServiceType.DNODE_SERVICE.getName());
   }
 
   @Override

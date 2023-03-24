@@ -44,7 +44,7 @@
         </dependency>
         <dependency>
             <groupId>com.timecho.awesome</groupId>
-            <artifactId>thrift-core</artifactId>
+            <artifactId>thrift</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
         <dependency>
@@ -56,6 +56,16 @@
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
             <version>31.1-jre</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-pool2</artifactId>
+            <version>2.11.1</version>
+        </dependency>
+        <dependency>
+            <groupId>cglib</groupId>
+            <artifactId>cglib-nodep</artifactId>
+            <version>3.1</version>
         </dependency>
     </dependencies>
 

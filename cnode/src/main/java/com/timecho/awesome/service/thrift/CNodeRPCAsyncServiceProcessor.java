@@ -20,19 +20,36 @@
 package com.timecho.awesome.service.thrift;
 
 import com.timecho.aweseme.thrift.ICNodeRPCService;
-import org.apache.thrift.TException;
+import com.timecho.awesome.client.AsyncDNodeClientPool;
 import org.apache.thrift.async.AsyncMethodCallback;
+
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class CNodeRPCAsyncServiceProcessor implements ICNodeRPCService.AsyncIface {
 
-  @Override
-  public void cpuRequest(long n, AsyncMethodCallback<Long> resultHandler) throws TException {
+  private static final ExecutorService EXECUTOR = Executors.newFixedThreadPool(4);
 
+  @Override
+  public void cpuRequest(long n, AsyncMethodCallback<Long> resultHandler) {
+    CompletableFuture<Long> cpuFuture = CompletableFuture.supplyAsync(() -> {
+      long z = 0;
+      for (int i = 0; i < n; i++) {
+        z += i;
+      }
+      return z;
+    }, EXECUTOR);
+    cpuFuture.thenAccept(resultHandler::onComplete);
   }
 
   @Override
-  public void ioRequest(AsyncMethodCallback<Boolean> resultHandler) throws TException {
-
+  public void ioRequest(AsyncMethodCallback<Boolean> resultHandler) {
+    CompletableFuture<Boolean> ioFuture = CompletableFuture.supplyAsync(() -> {
+      AsyncDNodeClientPool.getInstance().processIORequest();
+      return true;
+    });
+    ioFuture.thenAccept(resultHandler::onComplete);
   }
 
   public void handleClientExit() {}

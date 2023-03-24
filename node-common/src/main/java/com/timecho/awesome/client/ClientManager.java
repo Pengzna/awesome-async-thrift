@@ -17,11 +17,10 @@
  * under the License.
  */
 
-package com.timelab.awesome.client;
+package com.timecho.awesome.client;
 
-import com.timecho.aweseme.thrift.TEndPoint;
-import com.timelab.awesome.client.exception.BorrowNullClientManagerException;
-import com.timelab.awesome.client.exception.ClientManagerException;
+import com.timecho.awesome.exception.BorrowNullClientManagerException;
+import com.timecho.awesome.exception.ClientManagerException;
 import org.apache.commons.pool2.KeyedObjectPool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

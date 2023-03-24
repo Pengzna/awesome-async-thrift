@@ -17,37 +17,31 @@
  * under the License.
  */
 
-package com.timelab.awesome.client;
+package com.timecho.awesome.conf;
 
-import com.timelab.awesome.client.exception.ClientManagerException;
-import net.jcip.annotations.ThreadSafe;
+public enum ServiceType {
 
-@ThreadSafe
-public interface IClientManager<K, V> {
+  JMX_SERVICE("JMXService", "JMXService"),
+  CNODE_SERVICE("CNodeRPCService", "CNodeRPCService"),
+  DNODE_SERVICE("DNodeRPCService", "DNodeRPCService");
 
-  /**
-   * get a client V for node K from the IClientManager.
-   *
-   * @param node target node
-   * @return client
-   * @throws ClientManagerException for other exceptions
-   */
-  V borrowClient(K node) throws ClientManagerException;
+  private final String name;
+  private final String jmxName;
 
-  /**
-   * clear all clients for node K.
-   *
-   * @param node target node
-   */
-  void clear(K node);
+  ServiceType(String name, String jmxName) {
+    this.name = name;
+    this.jmxName = jmxName;
+  }
 
-  /** close IClientManager, which means closing all clients for all nodes. */
-  void close();
+  public String getName() {
+    return name;
+  }
 
-  class Factory<K, V> {
+  public String getJmxName() {
+    return jmxName;
+  }
 
-    public IClientManager<K, V> createClientManager(IClientPoolFactory<K, V> clientPoolFactory) {
-      return new ClientManager<>(clientPoolFactory);
-    }
+  private static String generateJmxName(String packageName, String jmxName) {
+    return String.format("%s:type=%s", packageName, jmxName);
   }
 }

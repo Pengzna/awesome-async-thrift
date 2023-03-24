@@ -19,6 +19,7 @@
 
 package com.timecho.awesome.service;
 
+import com.timecho.awesome.conf.ServiceType;
 import com.timecho.awesome.exception.StartupException;
 
 public interface IService {
@@ -37,5 +38,5 @@ public interface IService {
    *
    * @return current service name
    */
-  JMXService.ServiceType getID();
+  ServiceType getID();
 }

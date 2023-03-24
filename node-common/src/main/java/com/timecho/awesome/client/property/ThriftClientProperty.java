@@ -17,24 +17,30 @@
  * under the License.
  */
 
-package com.timelab.awesome.client.property;
+package com.timecho.awesome.client.property;
 
 import java.util.concurrent.TimeUnit;
 import org.apache.thrift.protocol.TBinaryProtocol;
 import org.apache.thrift.protocol.TCompactProtocol;
 import org.apache.thrift.protocol.TProtocolFactory;
 
+/** This class defines the configurations commonly used by the Thrift Client. */
 public class ThriftClientProperty {
 
   private final TProtocolFactory protocolFactory;
   private final int connectionTimeoutMs;
   private final int selectorNumOfAsyncClientPool;
+  private final boolean printLogWhenEncounterException;
 
-  public ThriftClientProperty(
-      TProtocolFactory protocolFactory, int connectionTimeoutMs, int selectorNumOfAsyncClientPool) {
+  private ThriftClientProperty(
+    TProtocolFactory protocolFactory,
+    int connectionTimeoutMs,
+    int selectorNumOfAsyncClientPool,
+    boolean printLogWhenEncounterException) {
     this.protocolFactory = protocolFactory;
     this.connectionTimeoutMs = connectionTimeoutMs;
     this.selectorNumOfAsyncClientPool = selectorNumOfAsyncClientPool;
+    this.printLogWhenEncounterException = printLogWhenEncounterException;
   }
 
   public TProtocolFactory getProtocolFactory() {
@@ -49,6 +55,10 @@ public class ThriftClientProperty {
     return selectorNumOfAsyncClientPool;
   }
 
+  public boolean isPrintLogWhenEncounterException() {
+    return printLogWhenEncounterException;
+  }
+
   public static class Builder {
 
     /** whether to use thrift compression. */
@@ -57,7 +67,14 @@ public class ThriftClientProperty {
     private int connectionTimeoutMs = DefaultProperty.CONNECTION_TIMEOUT_MS;
     /** number of selector threads for asynchronous thrift client in a clientManager. */
     private int selectorNumOfAsyncClientManager =
-        DefaultProperty.SELECTOR_NUM_OF_ASYNC_CLIENT_MANAGER;
+      DefaultProperty.SELECTOR_NUM_OF_ASYNC_CLIENT_MANAGER;
+
+    /**
+     * Whether to print logs when the client encounters exceptions. For example, logs are not
+     * printed in the heartbeat client.
+     */
+    private boolean printLogWhenEncounterException =
+      DefaultProperty.PRINT_LOG_WHEN_ENCOUNTER_EXCEPTION;
 
     public Builder setRpcThriftCompressionEnabled(boolean rpcThriftCompressionEnabled) {
       this.rpcThriftCompressionEnabled = rpcThriftCompressionEnabled;
@@ -74,22 +91,29 @@ public class ThriftClientProperty {
       return this;
     }
 
+    public Builder setPrintLogWhenEncounterException(boolean printLogWhenEncounterException) {
+      this.printLogWhenEncounterException = printLogWhenEncounterException;
+      return this;
+    }
+
     public ThriftClientProperty build() {
       return new ThriftClientProperty(
-          rpcThriftCompressionEnabled
-              ? new TCompactProtocol.Factory()
-              : new TBinaryProtocol.Factory(),
-          connectionTimeoutMs,
-          selectorNumOfAsyncClientManager);
+        rpcThriftCompressionEnabled
+          ? new TCompactProtocol.Factory()
+          : new TBinaryProtocol.Factory(),
+        connectionTimeoutMs,
+        selectorNumOfAsyncClientManager,
+        printLogWhenEncounterException);
     }
   }
 
-  public static class DefaultProperty {
+  private static class DefaultProperty {
 
     private DefaultProperty() {}
 
     public static final boolean RPC_THRIFT_COMPRESSED_ENABLED = false;
     public static final int CONNECTION_TIMEOUT_MS = (int) TimeUnit.SECONDS.toMillis(20);
     public static final int SELECTOR_NUM_OF_ASYNC_CLIENT_MANAGER = 1;
+    public static final boolean PRINT_LOG_WHEN_ENCOUNTER_EXCEPTION = true;
   }
 }

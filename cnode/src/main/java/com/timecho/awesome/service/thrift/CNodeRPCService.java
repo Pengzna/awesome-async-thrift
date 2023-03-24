@@ -24,7 +24,7 @@ import com.timecho.awesome.conf.CNodeConfig;
 import com.timecho.awesome.conf.CNodeDescriptor;
 import com.timecho.awesome.conf.CNodeServerType;
 import com.timecho.awesome.conf.NodeConstant;
-import com.timecho.awesome.service.JMXService;
+import com.timecho.awesome.conf.ServiceType;
 import org.apache.thrift.TBaseAsyncProcessor;
 
 public class CNodeRPCService extends ThriftService implements CNodeRPCServiceMBean {
@@ -55,8 +55,8 @@ public class CNodeRPCService extends ThriftService implements CNodeRPCServiceMBe
 
 
   @Override
-  public JMXService.ServiceType getID() {
-    return JMXService.ServiceType.CNODE_SERVICE;
+  public ServiceType getID() {
+    return ServiceType.CNODE_SERVICE;
   }
 
   @Override
@@ -80,7 +80,7 @@ public class CNodeRPCService extends ThriftService implements CNodeRPCServiceMBe
           new ThriftServiceThread(
             processor,
             getID().getName(),
-            JMXService.ServiceType.CNODE_SERVICE.getName(),
+            ServiceType.CNODE_SERVICE.getName(),
             getBindIP(),
             getBindPort(),
             CONF.getCnMaxConcurrentClientNum(),
@@ -94,7 +94,7 @@ public class CNodeRPCService extends ThriftService implements CNodeRPCServiceMBe
           new ThriftServiceThread(
             (TBaseAsyncProcessor<?>) processor,
             getID().getName(),
-            JMXService.ServiceType.CNODE_SERVICE.getName(),
+            ServiceType.CNODE_SERVICE.getName(),
             getBindIP(),
             getBindPort(),
             CONF.getCnSelectorNum(),
@@ -108,7 +108,7 @@ public class CNodeRPCService extends ThriftService implements CNodeRPCServiceMBe
         break;
     }
 
-    thriftServiceThread.setName(JMXService.ServiceType.CNODE_SERVICE.getName());
+    thriftServiceThread.setName(ServiceType.CNODE_SERVICE.getName());
   }
 
   @Override

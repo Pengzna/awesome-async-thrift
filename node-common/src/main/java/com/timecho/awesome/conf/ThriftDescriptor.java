@@ -17,18 +17,30 @@
  * under the License.
  */
 
-package com.timelab.awesome.client;
+package com.timecho.awesome.conf;
 
-import org.apache.commons.pool2.KeyedObjectPool;
+public class ThriftDescriptor {
 
-public interface IClientPoolFactory<K, V> {
+  private final ThriftConfig conf = new ThriftConfig();
 
-  /**
-   * We can implement this interface in other modules and then set the corresponding expected
-   * parameters and client factory classes.
-   *
-   * @param manager the reference to the clientManager
-   * @return A concurrency safe object pool
-   */
-  KeyedObjectPool<K, V> createClientPool(ClientManager<K, V> manager);
+  public ThriftConfig getConf() {
+    return conf;
+  }
+
+  private ThriftDescriptor() {
+    // Empty constructor
+  }
+
+  public static ThriftDescriptor getInstance() {
+    return ThriftDescriptorHolder.INSTANCE;
+  }
+
+  private static class ThriftDescriptorHolder {
+
+    private static final ThriftDescriptor INSTANCE = new ThriftDescriptor();
+
+    private ThriftDescriptorHolder() {
+      // Empty constructor
+    }
+  }
 }

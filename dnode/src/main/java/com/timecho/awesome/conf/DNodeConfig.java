@@ -19,12 +19,43 @@
 
 package com.timecho.awesome.conf;
 
+import com.timecho.aweseme.thrift.TEndPoint;
+
 public class DNodeConfig {
+
+  private TEndPoint cNode = new TEndPoint("127.0.0.1", 10710);
+
+  private RequestType requestType = RequestType.IO;
+  private int dnRequestNum = 1000;
 
   private String dnRpcAddress = "127.0.0.1";
   private int dnRpcPort = 6667;
 
   private int dnMaxConcurrentClientNum = 65535;
+
+  public TEndPoint getCNode() {
+    return cNode;
+  }
+
+  public void setCNode(TEndPoint cNode) {
+    this.cNode = cNode;
+  }
+
+  public RequestType getRequestType() {
+    return requestType;
+  }
+
+  public void setRequestType(RequestType requestType) {
+    this.requestType = requestType;
+  }
+
+  public int getDnRequestNum() {
+    return dnRequestNum;
+  }
+
+  public void setDnRequestNum(int dnRequestNum) {
+    this.dnRequestNum = dnRequestNum;
+  }
 
   public String getDnRpcAddress() {
     return dnRpcAddress;

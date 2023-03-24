@@ -17,25 +17,18 @@
  * under the License.
  */
 
-package com.timecho.awesome.service.thrift;
+package com.timecho.awesome.client.factory;
 
-import com.timecho.aweseme.thrift.ICNodeRPCService;
-import com.timecho.awesome.client.AsyncDNodeClientPool;
+import com.timecho.awesome.client.ClientManager;
+import com.timecho.awesome.client.property.ThriftClientProperty;
 
-public class CNodeRPCSyncServiceProcessor implements ICNodeRPCService.Iface {
+public abstract class ThriftClientFactory<K, V> extends BaseClientFactory<K, V> {
 
-  @Override
-  public long cpuRequest(long n) {
-    long z = 0;
-    for (int i = 0; i < n; i++) {
-      z += i;
-    }
-    return z;
-  }
+  protected ThriftClientProperty thriftClientProperty;
 
-  @Override
-  public boolean ioRequest() {
-    AsyncDNodeClientPool.getInstance().processIORequest();
-    return true;
+  protected ThriftClientFactory(
+    ClientManager<K, V> clientManager, ThriftClientProperty thriftClientProperty) {
+    super(clientManager);
+    this.thriftClientProperty = thriftClientProperty;
   }
 }

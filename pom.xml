@@ -28,8 +28,7 @@
   <packaging>pom</packaging>
   <version>1.0-SNAPSHOT</version>
   <modules>
-    <module>thrift-core</module>
-    <module>thrift-common</module>
+    <module>thrift</module>
     <module>cnode</module>
     <module>dnode</module>
     <module>node-common</module>
