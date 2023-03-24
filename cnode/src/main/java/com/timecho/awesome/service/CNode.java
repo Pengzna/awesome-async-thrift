@@ -19,7 +19,7 @@
 
 package com.timecho.awesome.service;
 
-import com.timecho.awesome.client.AsyncDNodeClientPool;
+import com.timecho.awesome.client.AsyncDNodeClientManager;
 import com.timecho.awesome.conf.CNodeConfig;
 import com.timecho.awesome.conf.NodeConstant;
 import com.timecho.awesome.conf.CNodeDescriptor;
@@ -55,8 +55,8 @@ public class CNode implements CNodeMBean {
       deactivate();
     }
 
-    logConfigurations();
-    AsyncDNodeClientPool.getInstance().activateClusterDNodes();
+    logTestConfigurations();
+    AsyncDNodeClientManager.getInstance().activateClusterDNodes();
   }
 
   private void setUpJMXService() throws StartupException {
@@ -66,19 +66,17 @@ public class CNode implements CNodeMBean {
   }
 
   private void setUpRPCService() throws StartupException {
-    CNodeRPCService cNodeRPCService = new CNodeRPCService(CONF.getCnServerType());
+    CNodeRPCService cNodeRPCService = new CNodeRPCService();
     registerManager.register(cNodeRPCService);
-    LOGGER.info("Successfully setup {}.", ServiceType.DNODE_SERVICE.getName());
+    LOGGER.info("Successfully setup {}.", ServiceType.CNODE_SERVICE.getName());
   }
 
-  private void logConfigurations() {
+  private void logTestConfigurations() {
     LOGGER.info("This test will run in the following configurations:");
-    LOGGER.info(String.format("\t %s: %s", NodeConstant.REQUEST_TYPE, CONF.getRequestType()));
     LOGGER.info(String.format("\t %s: %s", NodeConstant.CN_SERVER_TYPE, CONF.getCnServerType()));
-    LOGGER.info(String.format("\t %s: %s", NodeConstant.CN_SELECTOR_NUM, CONF.getCnSelectorNum()));
-    LOGGER.info(String.format("\t %s: %s", NodeConstant.CN_MAX_THREAD_POOL_SIZE, CONF.getCnMaxThreadPoolSize()));
+    LOGGER.info(String.format("\t %s: %s", NodeConstant.CN_ASYNC_SERVICE_SELECTOR_NUM, CONF.getCnAsyncServiceSelectorNum()));
+    LOGGER.info(String.format("\t %s: %s", NodeConstant.REQUEST_TYPE, CONF.getRequestType()));
     LOGGER.info(String.format("\t %s: %s", NodeConstant.DN_REQUEST_NUM, CONF.getDnRequestNum()));
-    LOGGER.info(String.format("\t %s: %s", NodeConstant.DN_MAX_CONCURRENT_CLIENT_NUM, CONF.getDnConcurrentClientNum()));
   }
 
   private void deactivate() {

@@ -21,19 +21,19 @@ package com.timecho.awesome.conf;
 
 import com.timecho.awesome.client.property.ClientPoolProperty;
 
-public class ThriftConfig {
+public class ClientPoolConfig {
 
-  private int selectorNumOfClientManager;
+  private int asyncSelectorNumOfClientManager = 4;
 
-  private int coreClientNumForEachNode = ClientPoolProperty.DefaultProperty.CORE_CLIENT_NUM_FOR_EACH_NODE;
-  private int maxClientNumForEachNode = ClientPoolProperty.DefaultProperty.MAX_CLIENT_NUM_FOR_EACH_NODE;
+  private int coreClientNumForEachNode = 200;
+  private int maxClientNumForEachNode = 300;
 
-  public int getSelectorNumOfClientManager() {
-    return selectorNumOfClientManager;
+  public int getAsyncSelectorNumOfClientManager() {
+    return asyncSelectorNumOfClientManager;
   }
 
-  public void setSelectorNumOfClientManager(int selectorNumOfClientManager) {
-    this.selectorNumOfClientManager = selectorNumOfClientManager;
+  public void setAsyncSelectorNumOfClientManager(int asyncSelectorNumOfClientManager) {
+    this.asyncSelectorNumOfClientManager = asyncSelectorNumOfClientManager;
   }
 
   public int getCoreClientNumForEachNode() {

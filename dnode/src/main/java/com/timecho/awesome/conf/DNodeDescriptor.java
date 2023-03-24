@@ -14,7 +14,8 @@ public class DNodeDescriptor {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(DNodeDescriptor.class);
 
-  private final DNodeConfig conf = new DNodeConfig();
+  private static final DNodeConfig CONF = new DNodeConfig();
+  private static final ClientPoolConfig CLIENT_POOL_CONFIG = ClientPoolDescriptor.getInstance().getConf();
 
   private void loadProperties() {
     URL propertiesUrl;
@@ -32,23 +33,68 @@ public class DNodeDescriptor {
       Properties properties = new Properties();
       properties.load(inputStream);
 
-      conf.setDnRpcAddress(
+      CONF.setDnRpcAddress(
         properties
-          .getProperty(NodeConstant.DN_RPC_ADDRESS, conf.getDnRpcAddress())
+          .getProperty(NodeConstant.DN_RPC_ADDRESS, CONF.getDnRpcAddress())
           .trim());
-      conf.setDnRpcPort(
+
+      CONF.setDnRpcPort(
         Integer.parseInt(
           properties
-            .getProperty(NodeConstant.DN_RPC_PORT, String.valueOf(conf.getDnRpcPort()))
+            .getProperty(NodeConstant.DN_RPC_PORT, String.valueOf(CONF.getDnRpcPort()))
+            .trim()));
+
+      CONF.setDnMinWorkerThreadNum(
+        Integer.parseInt(
+          properties
+            .getProperty(NodeConstant.DN_MIN_WORKER_THREAD_NUM, String.valueOf(CONF.getDnMinWorkerThreadNum()))
+            .trim()));
+
+      CONF.setDnMaxWorkerThreadNum(
+        Integer.parseInt(
+          properties
+            .getProperty(NodeConstant.DN_MAX_WORKER_THREAD_NUM, String.valueOf(CONF.getDnMaxWorkerThreadNum()))
+            .trim()));
+
+      CONF.setDnAsyncClientManagerSelectorNum(
+        Integer.parseInt(
+          properties
+            .getProperty(
+              NodeConstant.DN_ASYNC_CLIENT_MANAGER_SELECTOR_NUM,
+              String.valueOf(CONF.getDnAsyncClientManagerSelectorNum()))
+            .trim()));
+
+      CONF.setDnCoreClientNumForEachNode(
+        Integer.parseInt(
+          properties
+            .getProperty(
+              NodeConstant.DN_CORE_CLIENT_NUM_FOR_EACH_NODE,
+              String.valueOf(CONF.getDnCoreClientNumForEachNode()))
+            .trim()));
+
+      CONF.setDnMaxClientNumForEachNode(
+        Integer.parseInt(
+          properties
+            .getProperty(
+              NodeConstant.DN_MAX_CLIENT_NUM_FOR_EACH_NODE,
+              String.valueOf(CONF.getDnMaxClientNumForEachNode()))
             .trim()));
 
     } catch (IOException e) {
       LOGGER.warn("Error occurs when loading config file, use default config.", e);
     }
+
+    loadClientPoolConfig();
+  }
+
+  private void loadClientPoolConfig() {
+    CLIENT_POOL_CONFIG.setAsyncSelectorNumOfClientManager(CONF.getDnAsyncClientManagerSelectorNum());
+    CLIENT_POOL_CONFIG.setCoreClientNumForEachNode(CONF.getDnCoreClientNumForEachNode());
+    CLIENT_POOL_CONFIG.setMaxClientNumForEachNode(CONF.getDnMaxClientNumForEachNode());
   }
 
   public DNodeConfig getConf() {
-    return conf;
+    return CONF;
   }
 
   private DNodeDescriptor() {

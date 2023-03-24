@@ -139,6 +139,7 @@ public abstract class AbstractThriftServiceThread extends Thread {
     String threadsName,
     String bindAddress,
     int port,
+    int minWorkerThreads,
     int maxWorkerThreads,
     int timeoutSecond,
     TServerEventHandler serverEventHandler,
@@ -149,7 +150,7 @@ public abstract class AbstractThriftServiceThread extends Thread {
     try {
       serverTransport = openTransport(bindAddress, port);
       TThreadPoolServer.Args poolArgs =
-        initSyncedPoolArgs(processor, threadsName, maxWorkerThreads, timeoutSecond);
+        initSyncedPoolArgs(processor, threadsName, minWorkerThreads, maxWorkerThreads, timeoutSecond);
       poolServer = new TThreadPoolServer(poolArgs);
       poolServer.setServerEventHandler(serverEventHandler);
     } catch (TTransportException e) {
@@ -158,11 +159,11 @@ public abstract class AbstractThriftServiceThread extends Thread {
   }
 
   private TThreadPoolServer.Args initSyncedPoolArgs(
-    TProcessor processor, String threadsName, int maxWorkerThreads, int timeoutSecond) {
+    TProcessor processor, String threadsName, int minWorkerThreads, int maxWorkerThreads, int timeoutSecond) {
     TThreadPoolServer.Args poolArgs = new TThreadPoolServer.Args(serverTransport);
     poolArgs
+      .minWorkerThreads(minWorkerThreads)
       .maxWorkerThreads(maxWorkerThreads)
-      .minWorkerThreads(Runtime.getRuntime().availableProcessors())
       .stopTimeoutVal(timeoutSecond);
     executorService = ThreadPoolFactory.createThriftRpcClientThreadPool(poolArgs, threadsName);
     poolArgs.executorService = executorService;

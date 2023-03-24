@@ -32,39 +32,17 @@ public class CNodeConfig {
   private List<TEndPoint> workerDnList =
     Collections.singletonList(new TEndPoint("127.0.0.1", 6667));
 
-
-  private RequestType requestType = RequestType.IO;
-
   private CNodeServerType cnServerType = CNodeServerType.ASYNC;
-  private int cnSelectorNum = 4;
-
+  private int cnAsyncServiceSelectorNum = 4;
+  private RequestType requestType = RequestType.IO;
   private int dnRequestNum = 1000;
 
+  private int cnMinWorkerThreadNum = Runtime.getRuntime().availableProcessors();
+  private int cnMaxWorkerThreadNum = 65535;
 
-
-  private int cnMinConcurrentClientNum = Runtime.getRuntime().availableProcessors();
-  private int cnMaxConcurrentClientNum = 65535;
-
-  private int dnConcurrentClientNum = 65535;
-
-
-  private int cnMaxThreadPoolSize = 65535;
-
-  public int getCnMinConcurrentClientNum() {
-    return cnMinConcurrentClientNum;
-  }
-
-  public void setCnMinConcurrentClientNum(int cnMinConcurrentClientNum) {
-    this.cnMinConcurrentClientNum = cnMinConcurrentClientNum;
-  }
-
-  public int getCnMaxConcurrentClientNum() {
-    return cnMaxConcurrentClientNum;
-  }
-
-  public void setCnMaxConcurrentClientNum(int cnMaxConcurrentClientNum) {
-    this.cnMaxConcurrentClientNum = cnMaxConcurrentClientNum;
-  }
+  private int cnAsyncClientManagerSelectorNum = 4;
+  private int cnCoreClientNumForEachNode = 200;
+  private int cnMaxClientNumForEachNode = 300;
 
   public String getCnRpcAddress() {
     return cnRpcAddress;
@@ -82,36 +60,36 @@ public class CNodeConfig {
     this.cnRpcPort = cnRpcPort;
   }
 
-  public RequestType getRequestType() {
-    return requestType;
+  public List<TEndPoint> getWorkerDnList() {
+    return workerDnList;
   }
 
-  public void setRequestType(RequestType requestType) {
-    this.requestType = requestType;
+  public void setWorkerDnList(List<TEndPoint> workerDnList) {
+    this.workerDnList = workerDnList;
   }
 
   public CNodeServerType getCnServerType() {
     return cnServerType;
   }
 
-  public void setCnServerType(CNodeServerType cnodeCNodeServerType) {
-    this.cnServerType = cnodeCNodeServerType;
+  public void setCnServerType(CNodeServerType cnServerType) {
+    this.cnServerType = cnServerType;
   }
 
-  public int getCnSelectorNum() {
-    return cnSelectorNum;
+  public int getCnAsyncServiceSelectorNum() {
+    return cnAsyncServiceSelectorNum;
   }
 
-  public void setCnSelectorNum(int cnSelectorNum) {
-    this.cnSelectorNum = cnSelectorNum;
+  public void setCnAsyncServiceSelectorNum(int cnAsyncServiceSelectorNum) {
+    this.cnAsyncServiceSelectorNum = cnAsyncServiceSelectorNum;
   }
 
-  public int getCnMaxThreadPoolSize() {
-    return cnMaxThreadPoolSize;
+  public RequestType getRequestType() {
+    return requestType;
   }
 
-  public void setCnMaxThreadPoolSize(int cnMaxThreadPoolSize) {
-    this.cnMaxThreadPoolSize = cnMaxThreadPoolSize;
+  public void setRequestType(RequestType requestType) {
+    this.requestType = requestType;
   }
 
   public int getDnRequestNum() {
@@ -122,19 +100,43 @@ public class CNodeConfig {
     this.dnRequestNum = dnRequestNum;
   }
 
-  public int getDnConcurrentClientNum() {
-    return dnConcurrentClientNum;
+  public int getCnMinWorkerThreadNum() {
+    return cnMinWorkerThreadNum;
   }
 
-  public void setDnConcurrentClientNum(int dnConcurrentClientNum) {
-    this.dnConcurrentClientNum = dnConcurrentClientNum;
+  public void setCnMinWorkerThreadNum(int cnMinWorkerThreadNum) {
+    this.cnMinWorkerThreadNum = cnMinWorkerThreadNum;
   }
 
-  public List<TEndPoint> getWorkerDnList() {
-    return workerDnList;
+  public int getCnMaxWorkerThreadNum() {
+    return cnMaxWorkerThreadNum;
   }
 
-  public void setWorkerDnList(List<TEndPoint> workerDnList) {
-    this.workerDnList = workerDnList;
+  public void setCnMaxWorkerThreadNum(int cnMaxWorkerThreadNum) {
+    this.cnMaxWorkerThreadNum = cnMaxWorkerThreadNum;
+  }
+
+  public int getCnAsyncClientManagerSelectorNum() {
+    return cnAsyncClientManagerSelectorNum;
+  }
+
+  public void setCnAsyncClientManagerSelectorNum(int cnAsyncClientManagerSelectorNum) {
+    this.cnAsyncClientManagerSelectorNum = cnAsyncClientManagerSelectorNum;
+  }
+
+  public int getCnCoreClientNumForEachNode() {
+    return cnCoreClientNumForEachNode;
+  }
+
+  public void setCnCoreClientNumForEachNode(int cnCoreClientNumForEachNode) {
+    this.cnCoreClientNumForEachNode = cnCoreClientNumForEachNode;
+  }
+
+  public int getCnMaxClientNumForEachNode() {
+    return cnMaxClientNumForEachNode;
+  }
+
+  public void setCnMaxClientNumForEachNode(int cnMaxClientNumForEachNode) {
+    this.cnMaxClientNumForEachNode = cnMaxClientNumForEachNode;
   }
 }

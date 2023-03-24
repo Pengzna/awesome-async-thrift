@@ -22,6 +22,7 @@ package com.timecho.awesome.client;
 import com.timecho.aweseme.thrift.TDNodeConfiguration;
 import com.timecho.aweseme.thrift.TEndPoint;
 import com.timecho.awesome.client.async.AsyncDNodeServiceClient;
+import com.timecho.awesome.conf.CNodeConfig;
 import com.timecho.awesome.conf.CNodeDescriptor;
 import com.timecho.awesome.exception.ClientManagerException;
 import org.apache.thrift.TException;
@@ -30,15 +31,17 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
-public class AsyncDNodeClientPool {
+public class AsyncDNodeClientManager {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(AsyncDNodeClientPool.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(AsyncDNodeClientManager.class);
+
+  private static final CNodeConfig CONF = CNodeDescriptor.getInstance().getConf();
 
   private static final List<TEndPoint> WORKERS = CNodeDescriptor.getInstance().getConf().getWorkerDnList();
 
   private final IClientManager<TEndPoint, AsyncDNodeServiceClient> clientManager;
 
-  private AsyncDNodeClientPool() {
+  private AsyncDNodeClientManager() {
     clientManager =
       new IClientManager.Factory<TEndPoint, AsyncDNodeServiceClient>()
         .createClientManager(
@@ -48,7 +51,11 @@ public class AsyncDNodeClientPool {
   public void activateClusterDNodes() {
     for (TEndPoint worker : WORKERS) {
       try (AsyncDNodeServiceClient client = clientManager.borrowClient(worker)) {
-        client.activateDNode(new TDNodeConfiguration(), new EmptyAsyncHandler());
+        TDNodeConfiguration configuration = new TDNodeConfiguration();
+        configuration.setTargetCNode(new TEndPoint(CONF.getCnRpcAddress(), CONF.getCnRpcPort()));
+        configuration.setRequestType(CONF.getRequestType().getRequestType());
+        configuration.setRequestNum(CONF.getDnRequestNum());
+        client.activateDNode(configuration, new EmptyAsyncHandler());
       } catch (ClientManagerException | TException e) {
         LOGGER.error("Error when executing activateDNode", e);
       }
@@ -67,14 +74,14 @@ public class AsyncDNodeClientPool {
 
   private static class AsyncDNodeClientPoolHolder {
 
-    private static final AsyncDNodeClientPool INSTANCE = new AsyncDNodeClientPool();
+    private static final AsyncDNodeClientManager INSTANCE = new AsyncDNodeClientManager();
 
     private AsyncDNodeClientPoolHolder() {
       // Empty constructor
     }
   }
 
-  public static AsyncDNodeClientPool getInstance() {
+  public static AsyncDNodeClientManager getInstance() {
     return AsyncDNodeClientPoolHolder.INSTANCE;
   }
 }

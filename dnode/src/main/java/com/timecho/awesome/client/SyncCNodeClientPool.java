@@ -33,7 +33,7 @@ public class SyncCNodeClientPool {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(SyncCNodeClientPool.class);
 
-  private final static TEndPoint cNode = DNodeDescriptor.getInstance().getConf().getCNode();
+  private final static TEndPoint TARGET_CNODE = DNodeDescriptor.getInstance().getConf().getTargetCNode();
 
   private final IClientManager<TEndPoint, SyncCNodeServiceClient> clientManager;
 
@@ -45,7 +45,7 @@ public class SyncCNodeClientPool {
   }
 
   public void ioRequest() {
-    try (SyncCNodeServiceClient client = clientManager.borrowClient(cNode)) {
+    try (SyncCNodeServiceClient client = clientManager.borrowClient(TARGET_CNODE)) {
       client.ioRequest();
     } catch (TException | ClientManagerException e) {
       LOGGER.error("Error when executing ioRequest", e);
@@ -53,7 +53,7 @@ public class SyncCNodeClientPool {
   }
 
   public void cpuRequest() {
-    try (SyncCNodeServiceClient client = clientManager.borrowClient(cNode)) {
+    try (SyncCNodeServiceClient client = clientManager.borrowClient(TARGET_CNODE)) {
       client.cpuRequest(new Random().nextInt());
     } catch (TException | ClientManagerException e) {
       LOGGER.error("Error when executing ioRequest", e);

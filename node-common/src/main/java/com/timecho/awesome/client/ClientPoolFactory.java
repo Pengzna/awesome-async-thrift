@@ -26,14 +26,14 @@ import com.timecho.awesome.client.property.ThriftClientProperty;
 import com.timecho.awesome.client.sync.SyncCNodeServiceClient;
 import com.timecho.awesome.concurrent.ThreadName;
 import com.timecho.awesome.conf.NodeConstant;
-import com.timecho.awesome.conf.ThriftConfig;
-import com.timecho.awesome.conf.ThriftDescriptor;
+import com.timecho.awesome.conf.ClientPoolConfig;
+import com.timecho.awesome.conf.ClientPoolDescriptor;
 import org.apache.commons.pool2.KeyedObjectPool;
 import org.apache.commons.pool2.impl.GenericKeyedObjectPool;
 
 public class ClientPoolFactory {
 
-  private static final ThriftConfig CONF = ThriftDescriptor.getInstance().getConf();
+  private static final ClientPoolConfig CONF = ClientPoolDescriptor.getInstance().getConf();
 
   public static class SyncCNodeServiceClientPoolFactory
     implements IClientPoolFactory<TEndPoint, SyncCNodeServiceClient> {
@@ -68,7 +68,7 @@ public class ClientPoolFactory {
           new ThriftClientProperty.Builder()
             .setConnectionTimeoutMs(NodeConstant.CONNECTION_TIMEOUT_IN_MS)
             .setRpcThriftCompressionEnabled(NodeConstant.IS_ENABLE_THRIFT_COMPRESSION)
-            .setSelectorNumOfAsyncClientManager(CONF.getSelectorNumOfClientManager())
+            .setSelectorNumOfAsyncClientManager(CONF.getAsyncSelectorNumOfClientManager())
             .build(),
           ThreadName.ASYNC_DNODE_CLIENT_POOL.getName()),
         new ClientPoolProperty.Builder<AsyncDNodeServiceClient>()

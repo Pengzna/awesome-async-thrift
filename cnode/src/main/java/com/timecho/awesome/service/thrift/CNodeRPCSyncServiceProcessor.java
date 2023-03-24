@@ -20,7 +20,7 @@
 package com.timecho.awesome.service.thrift;
 
 import com.timecho.aweseme.thrift.ICNodeRPCService;
-import com.timecho.awesome.client.AsyncDNodeClientPool;
+import com.timecho.awesome.client.AsyncDNodeClientManager;
 
 public class CNodeRPCSyncServiceProcessor implements ICNodeRPCService.Iface {
 
@@ -35,7 +35,7 @@ public class CNodeRPCSyncServiceProcessor implements ICNodeRPCService.Iface {
 
   @Override
   public boolean ioRequest() {
-    AsyncDNodeClientPool.getInstance().processIORequest();
+    AsyncDNodeClientManager.getInstance().processIORequest();
     return true;
   }
 }

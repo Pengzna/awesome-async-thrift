@@ -37,10 +37,6 @@ public class ClientManager<K, V> implements IClientManager<K, V> {
     pool = factory.createClientPool(this);
   }
 
-  public KeyedObjectPool<K, V> getPool() {
-    return pool;
-  }
-
   @Override
   public V borrowClient(K node) throws ClientManagerException {
     if (node == null) {

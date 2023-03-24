@@ -36,7 +36,8 @@ public class CNodeDescriptor {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(CNodeDescriptor.class);
 
-  private final CNodeConfig conf = new CNodeConfig();
+  private static final CNodeConfig CONF = new CNodeConfig();
+  private static final ClientPoolConfig CLIENT_POOL_CONFIG = ClientPoolDescriptor.getInstance().getConf();
 
   private void loadProperties() {
     URL propertiesUrl;
@@ -54,64 +55,102 @@ public class CNodeDescriptor {
       Properties properties = new Properties();
       properties.load(inputStream);
 
-      conf.setCnRpcAddress(
+      CONF.setCnRpcAddress(
         properties
-          .getProperty(NodeConstant.CN_RPC_ADDRESS, conf.getCnRpcAddress())
+          .getProperty(NodeConstant.CN_RPC_ADDRESS, CONF.getCnRpcAddress())
           .trim());
 
-      conf.setCnRpcPort(
+      CONF.setCnRpcPort(
         Integer.parseInt(
           properties
             .getProperty(
-              NodeConstant.CN_RPC_PORT, String.valueOf(conf.getCnRpcPort()))
+              NodeConstant.CN_RPC_PORT, String.valueOf(CONF.getCnRpcPort()))
             .trim()));
 
       String dnUrls = properties.getProperty(NodeConstant.WORKER_DN_LIST);
       if (dnUrls != null) {
         try {
-          conf.setWorkerDnList(NodeUrlUtils.parseTEndPointUrls(dnUrls));
+          CONF.setWorkerDnList(NodeUrlUtils.parseTEndPointUrls(dnUrls));
         } catch (BadNodeUrlException e) {
           throw new ConfigurationException(e.getMessage());
         }
       }
 
-      conf.setRequestType(
-        RequestType.parse(
-          properties
-            .getProperty(NodeConstant.REQUEST_TYPE, conf.getRequestType().getRequestType())
-            .trim()));
-
-      conf.setCnServerType(
+      CONF.setCnServerType(
         CNodeServerType.parse(
           properties
-            .getProperty(NodeConstant.CN_SERVER_TYPE, conf.getCnServerType().getServerType())
+            .getProperty(NodeConstant.CN_SERVER_TYPE, CONF.getCnServerType().getServerType())
             .trim()));
 
-      conf.setCnSelectorNum(
+      CONF.setCnAsyncServiceSelectorNum(
         Integer.parseInt(
           properties
-            .getProperty(NodeConstant.CN_SELECTOR_NUM, String.valueOf(conf.getCnSelectorNum()))
+            .getProperty(NodeConstant.CN_ASYNC_SERVICE_SELECTOR_NUM, String.valueOf(CONF.getCnAsyncServiceSelectorNum()))
             .trim()));
 
-      conf.setDnRequestNum(
+      CONF.setRequestType(
+        RequestType.parse(
+          properties
+            .getProperty(NodeConstant.REQUEST_TYPE, CONF.getRequestType().getRequestType())
+            .trim()));
+
+      CONF.setDnRequestNum(
         Integer.parseInt(
           properties
-            .getProperty(NodeConstant.DN_REQUEST_NUM, String.valueOf(conf.getDnRequestNum()))
+            .getProperty(NodeConstant.DN_REQUEST_NUM, String.valueOf(CONF.getDnRequestNum()))
             .trim()));
 
+      CONF.setCnMinWorkerThreadNum(
+        Integer.parseInt(
+          properties
+            .getProperty(NodeConstant.CN_MIN_WORKER_THREAD_NUM, String.valueOf(CONF.getCnMinWorkerThreadNum()))
+            .trim()));
 
-      conf.setDnConcurrentClientNum(Integer.parseInt(properties.getProperty(NodeConstant.DN_MAX_CONCURRENT_CLIENT_NUM)));
+      CONF.setCnMaxWorkerThreadNum(
+        Integer.parseInt(
+          properties
+            .getProperty(NodeConstant.CN_MAX_WORKER_THREAD_NUM, String.valueOf(CONF.getCnMaxWorkerThreadNum()))
+            .trim()));
 
+      CONF.setCnAsyncClientManagerSelectorNum(
+        Integer.parseInt(
+          properties
+            .getProperty(
+              NodeConstant.CN_ASYNC_CLIENT_MANAGER_SELECTOR_NUM,
+              String.valueOf(CONF.getCnAsyncClientManagerSelectorNum()))
+            .trim()));
 
-      conf.setCnMaxThreadPoolSize(Integer.parseInt(properties.getProperty(NodeConstant.CN_MAX_THREAD_POOL_SIZE)));
+      CONF.setCnCoreClientNumForEachNode(
+        Integer.parseInt(
+          properties
+            .getProperty(
+              NodeConstant.CN_CORE_CLIENT_NUM_FOR_EACH_NODE,
+              String.valueOf(CONF.getCnCoreClientNumForEachNode()))
+            .trim()));
+
+      CONF.setCnMaxClientNumForEachNode(
+        Integer.parseInt(
+          properties
+            .getProperty(
+              NodeConstant.CN_MAX_CLIENT_NUM_FOR_EACH_NODE,
+              String.valueOf(CONF.getCnMaxClientNumForEachNode()))
+            .trim()));
 
     } catch (IOException | ConfigurationException e) {
       LOGGER.warn("Error occurs when loading config file, use default config.", e);
     }
+
+    loadClientPoolConfig();
+  }
+
+  private void loadClientPoolConfig() {
+    CLIENT_POOL_CONFIG.setAsyncSelectorNumOfClientManager(CONF.getCnAsyncClientManagerSelectorNum());
+    CLIENT_POOL_CONFIG.setCoreClientNumForEachNode(CONF.getCnCoreClientNumForEachNode());
+    CLIENT_POOL_CONFIG.setMaxClientNumForEachNode(CONF.getCnMaxClientNumForEachNode());
   }
 
   public CNodeConfig getConf() {
-    return conf;
+    return CONF;
   }
 
   private CNodeDescriptor() {

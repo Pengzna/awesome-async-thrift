@@ -20,7 +20,7 @@
 package com.timecho.awesome.service.thrift;
 
 import com.timecho.aweseme.thrift.ICNodeRPCService;
-import com.timecho.awesome.client.AsyncDNodeClientPool;
+import com.timecho.awesome.client.AsyncDNodeClientManager;
 import org.apache.thrift.async.AsyncMethodCallback;
 
 import java.util.concurrent.CompletableFuture;
@@ -46,7 +46,7 @@ public class CNodeRPCAsyncServiceProcessor implements ICNodeRPCService.AsyncIfac
   @Override
   public void ioRequest(AsyncMethodCallback<Boolean> resultHandler) {
     CompletableFuture<Boolean> ioFuture = CompletableFuture.supplyAsync(() -> {
-      AsyncDNodeClientPool.getInstance().processIORequest();
+      AsyncDNodeClientManager.getInstance().processIORequest();
       return true;
     });
     ioFuture.thenAccept(resultHandler::onComplete);

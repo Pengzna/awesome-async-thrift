@@ -31,15 +31,14 @@ public class CNodeRPCService extends ThriftService implements CNodeRPCServiceMBe
 
   private final static CNodeConfig CONF = CNodeDescriptor.getInstance().getConf();
 
-  private final CNodeServerType serverType;
+  private static final CNodeServerType serverType = CONF.getCnServerType();
   private final Object cnProcessor;
 
-  public CNodeRPCService(CNodeServerType serverType) {
+  public CNodeRPCService() {
     super.mbeanName =
       String.format(
         "%s:%s=%s", this.getClass().getPackage(), NodeConstant.JMX_TYPE, getID().getJmxName());
 
-    this.serverType = serverType;
     switch (serverType) {
       case SYNC:
         this.cnProcessor = new CNodeRPCSyncServiceProcessor();
@@ -83,7 +82,8 @@ public class CNodeRPCService extends ThriftService implements CNodeRPCServiceMBe
             ServiceType.CNODE_SERVICE.getName(),
             getBindIP(),
             getBindPort(),
-            CONF.getCnMaxConcurrentClientNum(),
+            CONF.getCnMinWorkerThreadNum(),
+            CONF.getCnMaxWorkerThreadNum(),
             NodeConstant.THRIFT_SERVER_AWAIT_TIME_FOR_STOP_SERVICE,
             new CNodeRPCSyncServiceHandler(),
             NodeConstant.IS_ENABLE_THRIFT_COMPRESSION);
@@ -97,9 +97,9 @@ public class CNodeRPCService extends ThriftService implements CNodeRPCServiceMBe
             ServiceType.CNODE_SERVICE.getName(),
             getBindIP(),
             getBindPort(),
-            CONF.getCnSelectorNum(),
-            CONF.getCnMinConcurrentClientNum(),
-            CONF.getCnMaxConcurrentClientNum(),
+            CONF.getCnAsyncServiceSelectorNum(),
+            CONF.getCnMinWorkerThreadNum(),
+            CONF.getCnMaxWorkerThreadNum(),
             NodeConstant.THRIFT_SERVER_AWAIT_TIME_FOR_STOP_SERVICE,
             new CNodeRPCAsyncServiceHandler((CNodeRPCAsyncServiceProcessor) cnProcessor),
             NodeConstant.IS_ENABLE_THRIFT_COMPRESSION,

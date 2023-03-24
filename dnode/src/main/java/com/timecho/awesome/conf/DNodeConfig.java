@@ -23,7 +23,7 @@ import com.timecho.aweseme.thrift.TEndPoint;
 
 public class DNodeConfig {
 
-  private TEndPoint cNode = new TEndPoint("127.0.0.1", 10710);
+  private TEndPoint targetCNode = new TEndPoint("127.0.0.1", 10710);
 
   private RequestType requestType = RequestType.IO;
   private int dnRequestNum = 1000;
@@ -31,14 +31,19 @@ public class DNodeConfig {
   private String dnRpcAddress = "127.0.0.1";
   private int dnRpcPort = 6667;
 
-  private int dnMaxConcurrentClientNum = 65535;
+  private int dnMinWorkerThreadNum = Runtime.getRuntime().availableProcessors();
+  private int dnMaxWorkerThreadNum = 65535;
 
-  public TEndPoint getCNode() {
-    return cNode;
+  private int dnAsyncClientManagerSelectorNum = 4;
+  private int dnCoreClientNumForEachNode = 200;
+  private int dnMaxClientNumForEachNode = 300;
+
+  public TEndPoint getTargetCNode() {
+    return targetCNode;
   }
 
-  public void setCNode(TEndPoint cNode) {
-    this.cNode = cNode;
+  public void setTargetCNode(TEndPoint targetCNode) {
+    this.targetCNode = targetCNode;
   }
 
   public RequestType getRequestType() {
@@ -73,11 +78,43 @@ public class DNodeConfig {
     this.dnRpcPort = dnRpcPort;
   }
 
-  public int getDnMaxConcurrentClientNum() {
-    return dnMaxConcurrentClientNum;
+  public int getDnMinWorkerThreadNum() {
+    return dnMinWorkerThreadNum;
   }
 
-  public void setDnMaxConcurrentClientNum(int dnMaxConcurrentClientNum) {
-    this.dnMaxConcurrentClientNum = dnMaxConcurrentClientNum;
+  public void setDnMinWorkerThreadNum(int dnMinWorkerThreadNum) {
+    this.dnMinWorkerThreadNum = dnMinWorkerThreadNum;
+  }
+
+  public int getDnMaxWorkerThreadNum() {
+    return dnMaxWorkerThreadNum;
+  }
+
+  public void setDnMaxWorkerThreadNum(int dnMaxWorkerThreadNum) {
+    this.dnMaxWorkerThreadNum = dnMaxWorkerThreadNum;
+  }
+
+  public int getDnAsyncClientManagerSelectorNum() {
+    return dnAsyncClientManagerSelectorNum;
+  }
+
+  public void setDnAsyncClientManagerSelectorNum(int dnAsyncClientManagerSelectorNum) {
+    this.dnAsyncClientManagerSelectorNum = dnAsyncClientManagerSelectorNum;
+  }
+
+  public int getDnCoreClientNumForEachNode() {
+    return dnCoreClientNumForEachNode;
+  }
+
+  public void setDnCoreClientNumForEachNode(int dnCoreClientNumForEachNode) {
+    this.dnCoreClientNumForEachNode = dnCoreClientNumForEachNode;
+  }
+
+  public int getDnMaxClientNumForEachNode() {
+    return dnMaxClientNumForEachNode;
+  }
+
+  public void setDnMaxClientNumForEachNode(int dnMaxClientNumForEachNode) {
+    this.dnMaxClientNumForEachNode = dnMaxClientNumForEachNode;
   }
 }

@@ -20,7 +20,8 @@
 package com.timecho.awesome.client.property;
 
 import java.time.Duration;
-import java.util.concurrent.TimeUnit;
+
+import com.timecho.awesome.conf.NodeConstant;
 import org.apache.commons.pool2.impl.GenericKeyedObjectPoolConfig;
 
 public class ClientPoolProperty<V> {
@@ -41,20 +42,15 @@ public class ClientPoolProperty<V> {
      * for applying for a client will be blocked for waitClientTimeoutMs, then ClientManager will
      * throw ClientManagerException if there are no clients after the block time.
      */
-    private long waitClientTimeoutMs = DefaultProperty.WAIT_CLIENT_TIMEOUT_MS;
+    private final long waitClientTimeoutMs = NodeConstant.CONNECTION_TIMEOUT_IN_MS;
 
     /** the maximum number of clients that can be allocated for a node. */
-    private int maxClientNumForEachNode = DefaultProperty.MAX_CLIENT_NUM_FOR_EACH_NODE;
+    private int maxClientNumForEachNode = 200;
     /**
      * the maximum number of clients that can be idle for a node. When the number of idle clients on
      * a node exceeds this number, newly returned clients will be released.
      */
-    private int coreClientNumForEachNode = DefaultProperty.CORE_CLIENT_NUM_FOR_EACH_NODE;
-
-    public Builder<V> setWaitClientTimeoutMs(long waitClientTimeoutMs) {
-      this.waitClientTimeoutMs = waitClientTimeoutMs;
-      return this;
-    }
+    private int coreClientNumForEachNode = 300;
 
     public Builder<V> setMaxClientNumForEachNode(int maxClientNumForEachNode) {
       this.maxClientNumForEachNode = maxClientNumForEachNode;
@@ -75,14 +71,5 @@ public class ClientPoolProperty<V> {
       poolConfig.setTestOnBorrow(true);
       return new ClientPoolProperty<>(poolConfig);
     }
-  }
-
-  public static class DefaultProperty {
-
-    private DefaultProperty() {}
-
-    public static final long WAIT_CLIENT_TIMEOUT_MS = TimeUnit.SECONDS.toMillis(10);
-    public static final int MAX_CLIENT_NUM_FOR_EACH_NODE = 300;
-    public static final int CORE_CLIENT_NUM_FOR_EACH_NODE = 200;
   }
 }

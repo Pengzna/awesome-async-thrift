@@ -23,30 +23,39 @@ import java.util.concurrent.TimeUnit;
 
 public class NodeConstant {
 
-  public static final String REQUEST_TYPE = "request_type";
-
   public static final String CN_RPC_ADDRESS = "cn_rpc_address";
   public static final String CN_RPC_PORT = "cn_rpc_port";
 
   public static final String WORKER_DN_LIST = "worker_dn_list";
 
   public static final String CN_SERVER_TYPE = "cn_server_type";
-  public static final String CN_SELECTOR_NUM = "cn_selector_num";
-  public static final String CN_MAX_THREAD_POOL_SIZE = "cn_max_thread_pool_size";
+  public static final String CN_ASYNC_SERVICE_SELECTOR_NUM = "cn_async_service_selector_num";
+  public static final String REQUEST_TYPE = "request_type";
+  public static final String DN_REQUEST_NUM = "dn_request_num";
+
+  public static final String CN_MIN_WORKER_THREAD_NUM = "cn_min_worker_thread_num";
+  public static final String CN_MAX_WORKER_THREAD_NUM = "cn_max_worker_thread_num";
+
+  public static final String CN_ASYNC_CLIENT_MANAGER_SELECTOR_NUM = "cn_async_client_manager_selector_num";
+  public static final String CN_CORE_CLIENT_NUM_FOR_EACH_NODE = "cn_core_client_num_for_each_node";
+  public static final String CN_MAX_CLIENT_NUM_FOR_EACH_NODE = "cn_max_client_num_for_each_node";
 
   public static final String DN_RPC_ADDRESS = "dn_rpc_address";
   public static final String DN_RPC_PORT = "dn_rpc_port";
-  public static final String DN_REQUEST_NUM = "dn_request_num";
-  public static final String DN_MAX_CONCURRENT_CLIENT_NUM = "dn_max_concurrent_client_num";
+
+  public static final String DN_MIN_WORKER_THREAD_NUM = "dn_min_worker_thread_num";
+  public static final String DN_MAX_WORKER_THREAD_NUM = "dn_max_worker_thread_num";
+
+  public static final String DN_ASYNC_CLIENT_MANAGER_SELECTOR_NUM = "dn_async_client_manager_selector_num";
+  public static final String DN_CORE_CLIENT_NUM_FOR_EACH_NODE = "dn_core_client_num_for_each_node";
+  public static final String DN_MAX_CLIENT_NUM_FOR_EACH_NODE = "dn_max_client_num_for_each_node";
 
   public static final String CNODE = "CNode";
   public static final String DNODE = "DNode";
 
-  public static final String CNODE_HOME = "CNODE_HOME";
   public static final String CNODE_CONF = "CNODE_CONF";
   public static final String CNODE_CONFIG_FILE_NAME = "cnode.properties";
 
-  public static final String DNODE_HOME = "DNODE_HOME";
   public static final String DNODE_CONF = "DNODE_CONF";
   public static final String DNODE_CONFIG_FILE_NAME = "dnode.properties";
 

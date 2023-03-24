@@ -19,27 +19,27 @@
 
 package com.timecho.awesome.conf;
 
-public class ThriftDescriptor {
+public class ClientPoolDescriptor {
 
-  private final ThriftConfig conf = new ThriftConfig();
+  private final ClientPoolConfig conf = new ClientPoolConfig();
 
-  public ThriftConfig getConf() {
+  public ClientPoolConfig getConf() {
     return conf;
   }
 
-  private ThriftDescriptor() {
+  private ClientPoolDescriptor() {
     // Empty constructor
   }
 
-  public static ThriftDescriptor getInstance() {
-    return ThriftDescriptorHolder.INSTANCE;
+  public static ClientPoolDescriptor getInstance() {
+    return ClientPoolDescriptorHolder.INSTANCE;
   }
 
-  private static class ThriftDescriptorHolder {
+  private static class ClientPoolDescriptorHolder {
 
-    private static final ThriftDescriptor INSTANCE = new ThriftDescriptor();
+    private static final ClientPoolDescriptor INSTANCE = new ClientPoolDescriptor();
 
-    private ThriftDescriptorHolder() {
+    private ClientPoolDescriptorHolder() {
       // Empty constructor
     }
   }

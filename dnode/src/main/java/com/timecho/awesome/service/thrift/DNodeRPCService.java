@@ -58,7 +58,8 @@ public class DNodeRPCService extends ThriftService implements DNodeRPCServiceMBe
         ServiceType.DNODE_SERVICE.getName(),
         getBindIP(),
         getBindPort(),
-        CONF.getDnMaxConcurrentClientNum(),
+        CONF.getDnMinWorkerThreadNum(),
+        CONF.getDnMaxWorkerThreadNum(),
         NodeConstant.THRIFT_SERVER_AWAIT_TIME_FOR_STOP_SERVICE,
         new DNodeRPCServiceHandler(),
         NodeConstant.IS_ENABLE_THRIFT_COMPRESSION);
