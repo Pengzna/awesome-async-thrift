@@ -135,5 +135,5 @@
         <appender-ref ref="FILEALL"/>
         <appender-ref ref="stdout"/>
     </root>
-    <logger level="info" name="com.timecho.awesome.service"/>
+    <logger level="info" name="com.timecho.awesome"/>
 </configuration>

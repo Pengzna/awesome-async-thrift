@@ -50,7 +50,8 @@ public class AsyncDNodeClientManager {
 
   public void activateClusterDNodes() {
     for (TEndPoint worker : WORKERS) {
-      try (AsyncDNodeServiceClient client = clientManager.borrowClient(worker)) {
+      try {
+        AsyncDNodeServiceClient client = clientManager.borrowClient(worker);
         TDNodeConfiguration configuration = new TDNodeConfiguration();
         configuration.setTargetCNode(new TEndPoint(CONF.getCnRpcAddress(), CONF.getCnRpcPort()));
         configuration.setRequestType(CONF.getRequestType().getRequestType());
@@ -64,7 +65,8 @@ public class AsyncDNodeClientManager {
 
   public void processIORequest() {
     for (TEndPoint worker : WORKERS) {
-      try (AsyncDNodeServiceClient client = clientManager.borrowClient(worker)) {
+      try {
+        AsyncDNodeServiceClient client = clientManager.borrowClient(worker);
         client.processIO(new EmptyAsyncHandler());
       } catch (ClientManagerException | TException e) {
         LOGGER.error("Error when executing processIORequest", e);

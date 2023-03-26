@@ -44,7 +44,7 @@ fi
 export DNODE_HOME="$(dirname "$0")/.."
 export DNODE_CONF=${DNODE_HOME}/conf
 export DNODE_LOG_DIR=${DNODE_HOME}/logs
-export DNODE_LOG_CONFIG="${DNODE_CONF}/logback-cnode.xml"
+export DNODE_LOG_CONFIG="${DNODE_CONF}/logback-dnode.xml"
 
 # ClassPath
 CLASSPATH=""

@@ -33,7 +33,7 @@ import org.apache.thrift.async.TAsyncClientManager;
 import java.io.IOException;
 
 public class AsyncDNodeServiceClient extends IDNodeRPCService.AsyncClient
-    implements ThriftClient, AutoCloseable {
+    implements ThriftClient {
 
   private final boolean printLogWhenEncounterException;
 
@@ -94,7 +94,6 @@ public class AsyncDNodeServiceClient extends IDNodeRPCService.AsyncClient
     clientManager.returnClient(endpoint, this);
   }
 
-  @Override
   public void close() {
     ___transport.close();
     ___currentMethod = null;
