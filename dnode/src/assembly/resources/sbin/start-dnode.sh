@@ -46,6 +46,8 @@ export DNODE_CONF=${DNODE_HOME}/conf
 export DNODE_LOG_DIR=${DNODE_HOME}/logs
 export DNODE_LOG_CONFIG="${DNODE_CONF}/logback-dnode.xml"
 
+mkdir -p "${DNODE_LOG_DIR}"
+
 # ClassPath
 CLASSPATH=""
 for f in "${DNODE_HOME}"/lib/*.jar; do
@@ -60,7 +62,7 @@ launch_service() {
   	dnode_params="$dnode_params -DDNODE_LOG_DIR=${DNODE_LOG_DIR}"
   	dnode_params="$dnode_params -Dlogback.configurationFile=${DNODE_LOG_CONFIG}"
 
-    "$JAVA" "$dnode_params" -cp "$CLASSPATH" "$class"
+    exec $NUMACTL "$JAVA" $dnode_params -cp "$CLASSPATH" "$class"
 
   	return $?
 

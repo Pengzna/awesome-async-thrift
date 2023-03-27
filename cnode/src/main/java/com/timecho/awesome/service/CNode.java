@@ -42,6 +42,8 @@ public class CNode implements CNodeMBean {
   private static final CNodeConfig CONF = CNodeDescriptor.getInstance().getConf();
 
   public static void main(String[] args) {
+    LOGGER.info("{} environmental variables: {}",
+      NodeConstant.CNODE, CNodeDescriptor.getEnvironmentalVariables());
     LOGGER.info("Activating {}...", NodeConstant.CNODE);
     CNode.getInstance().activate();
   }
@@ -76,6 +78,7 @@ public class CNode implements CNodeMBean {
     LOGGER.info(String.format("\t %s: %s", NodeConstant.CN_SERVER_TYPE, CONF.getCnServerType()));
     LOGGER.info(String.format("\t %s: %s", NodeConstant.CN_ASYNC_SERVICE_SELECTOR_NUM, CONF.getCnAsyncServiceSelectorNum()));
     LOGGER.info(String.format("\t %s: %s", NodeConstant.REQUEST_TYPE, CONF.getRequestType()));
+    LOGGER.info(String.format("\t %s: %s", NodeConstant.DN_CONCURRENT_CLIENT_NUM, CONF.getDnConcurrentClientNum()));
     LOGGER.info(String.format("\t %s: %s", NodeConstant.DN_REQUEST_NUM_PER_CLIENT, CONF.getDnRequestNumPerClient()));
   }
 

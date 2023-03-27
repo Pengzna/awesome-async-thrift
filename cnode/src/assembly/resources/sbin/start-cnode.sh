@@ -46,6 +46,8 @@ export CNODE_CONF=${CNODE_HOME}/conf
 export CNODE_LOG_DIR=${CNODE_HOME}/logs
 export CNODE_LOG_CONFIG="${CNODE_CONF}/logback-cnode.xml"
 
+mkdir -p "${CNODE_LOG_DIR}"
+
 # ClassPath
 CLASSPATH=""
 for f in "${CNODE_HOME}"/lib/*.jar; do
@@ -60,7 +62,7 @@ launch_service() {
   	cnode_params="$cnode_params -DCNODE_LOG_DIR=${CNODE_LOG_DIR}"
   	cnode_params="$cnode_params -Dlogback.configurationFile=${CNODE_LOG_CONFIG}"
 
-    "$JAVA" "$cnode_params" -cp "$CLASSPATH" "$class"
+    exec $NUMACTL "$JAVA" $cnode_params -cp "$CLASSPATH" "$class"
 
   	return $?
 

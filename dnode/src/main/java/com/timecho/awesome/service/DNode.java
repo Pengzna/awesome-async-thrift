@@ -19,6 +19,7 @@
 
 package com.timecho.awesome.service;
 
+import com.timecho.awesome.conf.DNodeDescriptor;
 import com.timecho.awesome.conf.NodeConstant;
 import com.timecho.awesome.conf.ServiceType;
 import com.timecho.awesome.exception.StartupException;
@@ -37,6 +38,8 @@ public class DNode implements DNodeMBean {
   private final RegisterManager registerManager = new RegisterManager();
 
   public static void main(String[] args) {
+    LOGGER.info("{} environmental variables: {}",
+      NodeConstant.DNODE, DNodeDescriptor.getEnvironmentalVariables());
     LOGGER.info("Activating {}...", NodeConstant.DNODE);
     DNode.getInstance().activate();
     LOGGER.info("{} is successfully started, waiting for CNode's schedule.", NodeConstant.DNODE);

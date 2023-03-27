@@ -24,6 +24,7 @@ import com.timecho.aweseme.thrift.TDNodeConfiguration;
 import com.timecho.awesome.client.SyncCNodeClientManager;
 import com.timecho.awesome.conf.DNodeConfig;
 import com.timecho.awesome.conf.DNodeDescriptor;
+import com.timecho.awesome.conf.NodeConstant;
 import com.timecho.awesome.conf.RequestType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,8 +41,11 @@ public class DNodeRPCServiceProcessor implements IDNodeRPCService.Iface {
 
   @Override
   public void activateDNode(TDNodeConfiguration configuration) {
-    LOGGER.info("DNode is activated with configuration: {}", configuration);
     DNodeDescriptor.loadTestConfig(configuration);
+    LOGGER.info("This test will run in the following configurations:");
+    LOGGER.info(String.format("\t %s: %s", NodeConstant.REQUEST_TYPE, CONF.getRequestType()));
+    LOGGER.info(String.format("\t %s: %s", NodeConstant.DN_CONCURRENT_CLIENT_NUM, CONF.getDnClientNum()));
+    LOGGER.info(String.format("\t %s: %s", NodeConstant.DN_REQUEST_NUM_PER_CLIENT, CONF.getDnRequestNum()));
 
     final int clientNum = CONF.getDnClientNum();
     final int requestNum = CONF.getDnRequestNum();
@@ -52,9 +56,13 @@ public class DNodeRPCServiceProcessor implements IDNodeRPCService.Iface {
           switch (requestType) {
             case CPU:
               SyncCNodeClientManager.getInstance().cpuRequest();
+              LOGGER.info("CPU request completed");
+              break;
             case IO:
             default:
               SyncCNodeClientManager.getInstance().ioRequest();
+              LOGGER.info("IO request completed");
+              break;
           }
         }
       });
@@ -64,8 +72,10 @@ public class DNodeRPCServiceProcessor implements IDNodeRPCService.Iface {
   @Override
   public void processIO() {
     try {
+      LOGGER.info("Processing IO");
       // Randomly sleeping for [500, 1000) ms
       TimeUnit.MILLISECONDS.sleep(500 + new Random().nextInt(500));
+      LOGGER.info("IO processing completed");
     } catch (InterruptedException e) {
       LOGGER.warn("Error when executing processIO", e);
     }

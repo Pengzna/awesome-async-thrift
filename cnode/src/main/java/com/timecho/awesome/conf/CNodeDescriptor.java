@@ -155,6 +155,23 @@ public class CNodeDescriptor {
     CLIENT_POOL_CONFIG.setMaxClientNumForEachNode(CONF.getCnMaxClientNumForEachNode());
   }
 
+  public static String getEnvironmentalVariables() {
+    return "\n\t"
+      + NodeConstant.CNODE_HOME
+      + "="
+      + System.getProperty(NodeConstant.CNODE_HOME, "null")
+      + ";"
+      + "\n\t"
+      + NodeConstant.CNODE_CONF
+      + "="
+      + System.getProperty(NodeConstant.CNODE_CONF, "null")
+      + ";"
+      + "\n\t"
+      + NodeConstant.LOGBACK_FILE
+      + "="
+      + System.getProperty(NodeConstant.LOGBACK_FILE, "null");
+  }
+
   public CNodeConfig getConf() {
     return CONF;
   }

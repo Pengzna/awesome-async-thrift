@@ -54,11 +54,15 @@ public class NodeConstant {
   public static final String CNODE = "CNode";
   public static final String DNODE = "DNode";
 
+  public static final String CNODE_HOME = "CNODE_HOME";
   public static final String CNODE_CONF = "CNODE_CONF";
   public static final String CNODE_CONFIG_FILE_NAME = "cnode.properties";
 
+  public static final String DNODE_HOME = "DNODE_HOME";
   public static final String DNODE_CONF = "DNODE_CONF";
   public static final String DNODE_CONFIG_FILE_NAME = "dnode.properties";
+
+  public static final String LOGBACK_FILE = "logback.configurationFile";
 
   public static final int CONNECTION_TIMEOUT_IN_MS = (int) TimeUnit.SECONDS.toMillis(20);
   public static final boolean IS_ENABLE_THRIFT_COMPRESSION = false;

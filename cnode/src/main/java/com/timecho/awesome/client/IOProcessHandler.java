@@ -20,10 +20,14 @@
 package com.timecho.awesome.client;
 
 import org.apache.thrift.async.AsyncMethodCallback;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.CompletableFuture;
 
 public class IOProcessHandler implements AsyncMethodCallback<Void> {
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(IOProcessHandler.class);
 
   private final CompletableFuture<Void> future;
 
@@ -34,6 +38,7 @@ public class IOProcessHandler implements AsyncMethodCallback<Void> {
   @Override
   public void onComplete(Void unused) {
     this.future.complete(null);
+    LOGGER.info("IO request completed");
   }
 
   @Override

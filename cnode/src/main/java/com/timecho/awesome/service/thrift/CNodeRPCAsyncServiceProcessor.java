@@ -25,6 +25,8 @@ import com.timecho.awesome.client.AsyncDNodeClientManager;
 import com.timecho.awesome.client.IOProcessHandler;
 import com.timecho.awesome.conf.CNodeDescriptor;
 import org.apache.thrift.async.AsyncMethodCallback;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,11 +35,13 @@ import java.util.concurrent.ExecutorService;
 
 public class CNodeRPCAsyncServiceProcessor implements ICNodeRPCService.AsyncIface {
 
+  private static final Logger LOGGER = LoggerFactory.getLogger(CNodeRPCAsyncServiceProcessor.class);
+
   private static final List<TEndPoint> WORKERS = CNodeDescriptor.getInstance().getConf().getWorkerDnList();
 
-  private final ExecutorService executorService;
+  private ExecutorService executorService;
 
-  public CNodeRPCAsyncServiceProcessor(ExecutorService executorService) {
+  public void setExecutorService(ExecutorService executorService) {
     this.executorService = executorService;
   }
 
@@ -48,6 +52,7 @@ public class CNodeRPCAsyncServiceProcessor implements ICNodeRPCService.AsyncIfac
       for (int i = 0; i < n; i++) {
         z *= i;
       }
+      LOGGER.info("CPU request completed");
       return z;
     }, executorService);
     cpuFuture.thenAccept(resultHandler::onComplete);
@@ -57,15 +62,19 @@ public class CNodeRPCAsyncServiceProcessor implements ICNodeRPCService.AsyncIfac
   public void ioRequest(AsyncMethodCallback<Boolean> resultHandler) {
     List<CompletableFuture<Void>> ioFutures = new ArrayList<>();
     for (TEndPoint worker : WORKERS) {
-      CompletableFuture<Void> ioFuture = new CompletableFuture<>();
-      IOProcessHandler ioProcessHandler = new IOProcessHandler(ioFuture);
-      ioFuture.thenRunAsync(() ->
+      CompletableFuture<Void> ioCallback = new CompletableFuture<>();
+      IOProcessHandler ioProcessHandler = new IOProcessHandler(ioCallback);
+      LOGGER.info("Begin IO request to worker: {}", worker);
+      CompletableFuture.runAsync(() ->
         AsyncDNodeClientManager.getInstance().processIORequest(worker, ioProcessHandler), executorService);
-      ioFutures.add(ioFuture);
+      ioFutures.add(ioCallback);
     }
 
     CompletableFuture<Void> allFutures = CompletableFuture.allOf(ioFutures.toArray(new CompletableFuture[0]));
-    allFutures.thenRunAsync(() -> resultHandler.onComplete(true), executorService);
+    allFutures.thenRun(() -> {
+      LOGGER.info("All IO requests completed");
+      resultHandler.onComplete(true);
+    });
   }
 
   public void handleClientExit() {}

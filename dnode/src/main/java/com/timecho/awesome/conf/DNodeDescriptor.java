@@ -106,6 +106,23 @@ public class DNodeDescriptor {
     CONF.setDnRequestNum(configuration.getRequestNum());
   }
 
+  public static String getEnvironmentalVariables() {
+    return "\n\t"
+      + NodeConstant.DNODE_HOME
+      + "="
+      + System.getProperty(NodeConstant.DNODE_HOME, "null")
+      + ";"
+      + "\n\t"
+      + NodeConstant.DNODE_CONF
+      + "="
+      + System.getProperty(NodeConstant.DNODE_CONF, "null")
+      + ";"
+      + "\n\t"
+      + NodeConstant.LOGBACK_FILE
+      + "="
+      + System.getProperty(NodeConstant.LOGBACK_FILE, "null");
+  }
+
   public DNodeConfig getConf() {
     return CONF;
   }
