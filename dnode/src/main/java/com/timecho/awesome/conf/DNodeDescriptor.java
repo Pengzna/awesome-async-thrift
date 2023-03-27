@@ -1,5 +1,7 @@
 package com.timecho.awesome.conf;
 
+import com.timecho.aweseme.thrift.TDNodeConfiguration;
+import com.timecho.awesome.exception.ConfigurationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -91,6 +93,17 @@ public class DNodeDescriptor {
     CLIENT_POOL_CONFIG.setAsyncSelectorNumOfClientManager(CONF.getDnAsyncClientManagerSelectorNum());
     CLIENT_POOL_CONFIG.setCoreClientNumForEachNode(CONF.getDnCoreClientNumForEachNode());
     CLIENT_POOL_CONFIG.setMaxClientNumForEachNode(CONF.getDnMaxClientNumForEachNode());
+  }
+
+  public static void loadTestConfig(TDNodeConfiguration configuration) {
+    CONF.setTargetCNode(configuration.getTargetCNode());
+    try {
+      CONF.setRequestType(RequestType.parse(configuration.getRequestType()));
+    } catch (ConfigurationException e) {
+      throw new RuntimeException(e);
+    }
+    CONF.setDnClientNum(configuration.getClientNum());
+    CONF.setDnRequestNum(configuration.getRequestNum());
   }
 
   public DNodeConfig getConf() {

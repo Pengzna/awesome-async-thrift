@@ -21,6 +21,7 @@ package com.timecho.awesome.client;
 
 import com.timecho.aweseme.thrift.TEndPoint;
 import com.timecho.awesome.client.sync.SyncCNodeServiceClient;
+import com.timecho.awesome.conf.DNodeConfig;
 import com.timecho.awesome.conf.DNodeDescriptor;
 import com.timecho.awesome.exception.ClientManagerException;
 import org.apache.thrift.TException;
@@ -29,15 +30,15 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Random;
 
-public class SyncCNodeClientPool {
+public class SyncCNodeClientManager {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(SyncCNodeClientPool.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(SyncCNodeClientManager.class);
 
-  private final static TEndPoint TARGET_CNODE = DNodeDescriptor.getInstance().getConf().getTargetCNode();
+  private static final DNodeConfig CONF = DNodeDescriptor.getInstance().getConf();
 
   private final IClientManager<TEndPoint, SyncCNodeServiceClient> clientManager;
 
-  private SyncCNodeClientPool() {
+  private SyncCNodeClientManager() {
     clientManager =
       new IClientManager.Factory<TEndPoint, SyncCNodeServiceClient>()
         .createClientManager(
@@ -45,7 +46,8 @@ public class SyncCNodeClientPool {
   }
 
   public void ioRequest() {
-    try (SyncCNodeServiceClient client = clientManager.borrowClient(TARGET_CNODE)) {
+    final TEndPoint targetCNode = CONF.getTargetCNode();
+    try (SyncCNodeServiceClient client = clientManager.borrowClient(targetCNode)) {
       client.ioRequest();
     } catch (TException | ClientManagerException e) {
       LOGGER.error("Error when executing ioRequest", e);
@@ -53,9 +55,11 @@ public class SyncCNodeClientPool {
   }
 
   public void cpuRequest() {
+    final TEndPoint targetCNode = CONF.getTargetCNode();
     final int base = 9000_0000;
     final int offset = 1000_0000;
-    try (SyncCNodeServiceClient client = clientManager.borrowClient(TARGET_CNODE)) {
+    try (SyncCNodeServiceClient client = clientManager.borrowClient(targetCNode)) {
+      // A thread in the CNode will be occupied for about 1000 ms
       client.cpuRequest(base + new Random().nextInt(offset));
     } catch (TException | ClientManagerException e) {
       LOGGER.error("Error when executing ioRequest", e);
@@ -64,14 +68,14 @@ public class SyncCNodeClientPool {
 
   private static class SyncCNodeClientPoolHolder {
 
-    private static final SyncCNodeClientPool INSTANCE = new SyncCNodeClientPool();
+    private static final SyncCNodeClientManager INSTANCE = new SyncCNodeClientManager();
 
     private SyncCNodeClientPoolHolder() {
       // Empty constructor
     }
   }
 
-  public static SyncCNodeClientPool getInstance() {
+  public static SyncCNodeClientManager getInstance() {
     return SyncCNodeClientPoolHolder.INSTANCE;
   }
 }

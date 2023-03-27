@@ -76,7 +76,7 @@ public class CNode implements CNodeMBean {
     LOGGER.info(String.format("\t %s: %s", NodeConstant.CN_SERVER_TYPE, CONF.getCnServerType()));
     LOGGER.info(String.format("\t %s: %s", NodeConstant.CN_ASYNC_SERVICE_SELECTOR_NUM, CONF.getCnAsyncServiceSelectorNum()));
     LOGGER.info(String.format("\t %s: %s", NodeConstant.REQUEST_TYPE, CONF.getRequestType()));
-    LOGGER.info(String.format("\t %s: %s", NodeConstant.DN_REQUEST_NUM, CONF.getDnRequestNum()));
+    LOGGER.info(String.format("\t %s: %s", NodeConstant.DN_REQUEST_NUM_PER_CLIENT, CONF.getDnRequestNumPerClient()));
   }
 
   private void deactivate() {

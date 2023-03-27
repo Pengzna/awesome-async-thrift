@@ -94,10 +94,16 @@ public class CNodeDescriptor {
             .getProperty(NodeConstant.REQUEST_TYPE, CONF.getRequestType().getRequestType())
             .trim()));
 
-      CONF.setDnRequestNum(
+      CONF.setDnConcurrentClientNum(
         Integer.parseInt(
           properties
-            .getProperty(NodeConstant.DN_REQUEST_NUM, String.valueOf(CONF.getDnRequestNum()))
+            .getProperty(NodeConstant.DN_CONCURRENT_CLIENT_NUM, String.valueOf(CONF.getDnConcurrentClientNum()))
+            .trim()));
+
+      CONF.setDnRequestNumPerClient(
+        Integer.parseInt(
+          properties
+            .getProperty(NodeConstant.DN_REQUEST_NUM_PER_CLIENT, String.valueOf(CONF.getDnRequestNumPerClient()))
             .trim()));
 
       CONF.setCnMinWorkerThreadNum(

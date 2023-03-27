@@ -31,7 +31,8 @@ public class NodeConstant {
   public static final String CN_SERVER_TYPE = "cn_server_type";
   public static final String CN_ASYNC_SERVICE_SELECTOR_NUM = "cn_async_service_selector_num";
   public static final String REQUEST_TYPE = "request_type";
-  public static final String DN_REQUEST_NUM = "dn_request_num";
+  public static final String DN_CONCURRENT_CLIENT_NUM = "dn_concurrent_client_num";
+  public static final String DN_REQUEST_NUM_PER_CLIENT = "dn_request_num_per_client";
 
   public static final String CN_MIN_WORKER_THREAD_NUM = "cn_min_worker_thread_num";
   public static final String CN_MAX_WORKER_THREAD_NUM = "cn_max_worker_thread_num";

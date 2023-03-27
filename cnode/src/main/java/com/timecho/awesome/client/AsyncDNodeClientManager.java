@@ -56,7 +56,8 @@ public class AsyncDNodeClientManager {
         TDNodeConfiguration configuration = new TDNodeConfiguration();
         configuration.setTargetCNode(new TEndPoint(CONF.getCnRpcAddress(), CONF.getCnRpcPort()));
         configuration.setRequestType(CONF.getRequestType().getRequestType());
-        configuration.setRequestNum(CONF.getDnRequestNum());
+        configuration.setClientNum(CONF.getDnConcurrentClientNum());
+        configuration.setRequestNum(CONF.getDnRequestNumPerClient());
         client.activateDNode(configuration, new EmptyAsyncHandler());
       } catch (ClientManagerException | TException e) {
         LOGGER.error("Error when executing activateDNode", e);

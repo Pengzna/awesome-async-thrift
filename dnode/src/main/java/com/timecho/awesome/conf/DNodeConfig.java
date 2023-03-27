@@ -26,7 +26,8 @@ public class DNodeConfig {
   private TEndPoint targetCNode = new TEndPoint("127.0.0.1", 10710);
 
   private RequestType requestType = RequestType.IO;
-  private int dnRequestNum = 1000;
+  private int dnClientNum = 10;
+  private int dnRequestNum = 100;
 
   private String dnRpcAddress = "127.0.0.1";
   private int dnRpcPort = 6667;
@@ -52,6 +53,14 @@ public class DNodeConfig {
 
   public void setRequestType(RequestType requestType) {
     this.requestType = requestType;
+  }
+
+  public int getDnClientNum() {
+    return dnClientNum;
+  }
+
+  public void setDnClientNum(int dnClientNum) {
+    this.dnClientNum = dnClientNum;
   }
 
   public int getDnRequestNum() {

@@ -33,9 +33,10 @@ public class CNodeConfig {
     Collections.singletonList(new TEndPoint("127.0.0.1", 6667));
 
   private CNodeServerType cnServerType = CNodeServerType.ASYNC;
-  private int cnAsyncServiceSelectorNum = 4;
+  private int cnAsyncServiceSelectorNum = 1;
   private RequestType requestType = RequestType.IO;
-  private int dnRequestNum = 1000;
+  private int dnConcurrentClientNum = 10;
+  private int dnRequestNumPerClient = 100;
 
   private int cnMinWorkerThreadNum = Runtime.getRuntime().availableProcessors();
   private int cnMaxWorkerThreadNum = 65535;
@@ -92,12 +93,20 @@ public class CNodeConfig {
     this.requestType = requestType;
   }
 
-  public int getDnRequestNum() {
-    return dnRequestNum;
+  public int getDnConcurrentClientNum() {
+    return dnConcurrentClientNum;
   }
 
-  public void setDnRequestNum(int dnRequestNum) {
-    this.dnRequestNum = dnRequestNum;
+  public void setDnConcurrentClientNum(int dnConcurrentClientNum) {
+    this.dnConcurrentClientNum = dnConcurrentClientNum;
+  }
+
+  public int getDnRequestNumPerClient() {
+    return dnRequestNumPerClient;
+  }
+
+  public void setDnRequestNumPerClient(int dnRequestNumPerClient) {
+    this.dnRequestNumPerClient = dnRequestNumPerClient;
   }
 
   public int getCnMinWorkerThreadNum() {

@@ -21,15 +21,15 @@ package com.timecho.awesome.service.thrift;
 
 import com.timecho.aweseme.thrift.IDNodeRPCService;
 import com.timecho.aweseme.thrift.TDNodeConfiguration;
-import com.timecho.awesome.client.SyncCNodeClientPool;
+import com.timecho.awesome.client.SyncCNodeClientManager;
 import com.timecho.awesome.conf.DNodeConfig;
 import com.timecho.awesome.conf.DNodeDescriptor;
 import com.timecho.awesome.conf.RequestType;
-import org.apache.thrift.TException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Random;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
 public class DNodeRPCServiceProcessor implements IDNodeRPCService.Iface {
@@ -40,16 +40,24 @@ public class DNodeRPCServiceProcessor implements IDNodeRPCService.Iface {
 
   @Override
   public void activateDNode(TDNodeConfiguration configuration) {
+    LOGGER.info("DNode is activated with configuration: {}", configuration);
+    DNodeDescriptor.loadTestConfig(configuration);
+
+    final int clientNum = CONF.getDnClientNum();
     final int requestNum = CONF.getDnRequestNum();
     final RequestType requestType = CONF.getRequestType();
-    for (int request = 0; request < requestNum; request++) {
-      switch (requestType) {
-        case CPU:
-          SyncCNodeClientPool.getInstance().cpuRequest();
-        case IO:
-        default:
-          SyncCNodeClientPool.getInstance().ioRequest();
-      }
+    for (int i = 0; i < clientNum; i++) {
+      CompletableFuture.runAsync(() -> {
+        for (int request = 0; request < requestNum; request++) {
+          switch (requestType) {
+            case CPU:
+              SyncCNodeClientManager.getInstance().cpuRequest();
+            case IO:
+            default:
+              SyncCNodeClientManager.getInstance().ioRequest();
+          }
+        }
+      });
     }
   }
 

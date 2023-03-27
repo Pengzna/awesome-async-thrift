@@ -27,5 +27,6 @@ struct TEndPoint {
 struct TDNodeConfiguration {
   1: required TEndPoint targetCNode
   2: required string requestType
-  3: required i32 requestNum
+  3: required i32 clientNum
+  4: required i32 requestNum
 }
