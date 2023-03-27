@@ -20,36 +20,52 @@
 package com.timecho.awesome.service.thrift;
 
 import com.timecho.aweseme.thrift.ICNodeRPCService;
+import com.timecho.aweseme.thrift.TEndPoint;
 import com.timecho.awesome.client.AsyncDNodeClientManager;
+import com.timecho.awesome.client.IOProcessHandler;
+import com.timecho.awesome.conf.CNodeDescriptor;
 import org.apache.thrift.async.AsyncMethodCallback;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 public class CNodeRPCAsyncServiceProcessor implements ICNodeRPCService.AsyncIface {
 
-  private static final ExecutorService EXECUTOR = Executors.newFixedThreadPool(4);
+  private static final List<TEndPoint> WORKERS = CNodeDescriptor.getInstance().getConf().getWorkerDnList();
+
+  private final ExecutorService executorService;
+
+  public CNodeRPCAsyncServiceProcessor(ExecutorService executorService) {
+    this.executorService = executorService;
+  }
 
   @Override
   public void cpuRequest(long n, AsyncMethodCallback<Long> resultHandler) {
     CompletableFuture<Long> cpuFuture = CompletableFuture.supplyAsync(() -> {
-      long z = 0;
+      long z = 1;
       for (int i = 0; i < n; i++) {
-        z += i;
+        z *= i;
       }
       return z;
-    }, EXECUTOR);
+    }, executorService);
     cpuFuture.thenAccept(resultHandler::onComplete);
   }
 
   @Override
   public void ioRequest(AsyncMethodCallback<Boolean> resultHandler) {
-    CompletableFuture<Boolean> ioFuture = CompletableFuture.supplyAsync(() -> {
-      AsyncDNodeClientManager.getInstance().processIORequest();
-      return true;
-    });
-    ioFuture.thenAccept(resultHandler::onComplete);
+    List<CompletableFuture<Void>> ioFutures = new ArrayList<>();
+    for (TEndPoint worker : WORKERS) {
+      CompletableFuture<Void> ioFuture = new CompletableFuture<>();
+      IOProcessHandler ioProcessHandler = new IOProcessHandler(ioFuture);
+      ioFuture.thenRunAsync(() ->
+        AsyncDNodeClientManager.getInstance().processIORequest(worker, ioProcessHandler), executorService);
+      ioFutures.add(ioFuture);
+    }
+
+    CompletableFuture<Void> allFutures = CompletableFuture.allOf(ioFutures.toArray(new CompletableFuture[0]));
+    allFutures.thenRunAsync(() -> resultHandler.onComplete(true), executorService);
   }
 
   public void handleClientExit() {}

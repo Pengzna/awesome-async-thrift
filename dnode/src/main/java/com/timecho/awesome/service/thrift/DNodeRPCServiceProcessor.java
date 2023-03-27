@@ -40,8 +40,6 @@ public class DNodeRPCServiceProcessor implements IDNodeRPCService.Iface {
 
   @Override
   public void activateDNode(TDNodeConfiguration configuration) {
-
-
     final int requestNum = CONF.getDnRequestNum();
     final RequestType requestType = CONF.getRequestType();
     for (int request = 0; request < requestNum; request++) {

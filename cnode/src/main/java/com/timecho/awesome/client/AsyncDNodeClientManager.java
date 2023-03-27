@@ -26,6 +26,7 @@ import com.timecho.awesome.conf.CNodeConfig;
 import com.timecho.awesome.conf.CNodeDescriptor;
 import com.timecho.awesome.exception.ClientManagerException;
 import org.apache.thrift.TException;
+import org.apache.thrift.async.AsyncMethodCallback;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,7 +38,7 @@ public class AsyncDNodeClientManager {
 
   private static final CNodeConfig CONF = CNodeDescriptor.getInstance().getConf();
 
-  private static final List<TEndPoint> WORKERS = CNodeDescriptor.getInstance().getConf().getWorkerDnList();
+  private static final List<TEndPoint> WORKERS = CONF.getWorkerDnList();
 
   private final IClientManager<TEndPoint, AsyncDNodeServiceClient> clientManager;
 
@@ -63,14 +64,12 @@ public class AsyncDNodeClientManager {
     }
   }
 
-  public void processIORequest() {
-    for (TEndPoint worker : WORKERS) {
-      try {
-        AsyncDNodeServiceClient client = clientManager.borrowClient(worker);
-        client.processIO(new EmptyAsyncHandler());
-      } catch (ClientManagerException | TException e) {
-        LOGGER.error("Error when executing processIORequest", e);
-      }
+  public void processIORequest(TEndPoint worker, AsyncMethodCallback<Void> handler) {
+    try {
+      AsyncDNodeServiceClient client = clientManager.borrowClient(worker);
+      client.processIO(handler);
+    } catch (ClientManagerException | TException e) {
+      LOGGER.error("Error when executing processIORequest", e);
     }
   }
 

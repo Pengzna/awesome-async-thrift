@@ -53,8 +53,10 @@ public class SyncCNodeClientPool {
   }
 
   public void cpuRequest() {
+    final int base = 9000_0000;
+    final int offset = 1000_0000;
     try (SyncCNodeServiceClient client = clientManager.borrowClient(TARGET_CNODE)) {
-      client.cpuRequest(new Random().nextInt());
+      client.cpuRequest(base + new Random().nextInt(offset));
     } catch (TException | ClientManagerException e) {
       LOGGER.error("Error when executing ioRequest", e);
     }

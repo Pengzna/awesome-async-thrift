@@ -253,4 +253,8 @@ public abstract class AbstractThriftServiceThread extends Thread {
     }
     return false;
   }
+
+  public ExecutorService getExecutorService() {
+    return executorService;
+  }
 }

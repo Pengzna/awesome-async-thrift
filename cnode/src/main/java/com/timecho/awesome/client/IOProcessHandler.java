@@ -17,34 +17,27 @@
  * under the License.
  */
 
-package com.timecho.awesome.service.thrift;
+package com.timecho.awesome.client;
 
-import com.timecho.aweseme.thrift.ICNodeRPCService;
-import com.timecho.aweseme.thrift.TEndPoint;
-import com.timecho.awesome.client.AsyncDNodeClientManager;
-import com.timecho.awesome.client.EmptyAsyncHandler;
-import com.timecho.awesome.conf.CNodeDescriptor;
+import org.apache.thrift.async.AsyncMethodCallback;
 
-import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
-public class CNodeRPCSyncServiceProcessor implements ICNodeRPCService.Iface {
+public class IOProcessHandler implements AsyncMethodCallback<Void> {
 
-  private static final List<TEndPoint> WORKERS = CNodeDescriptor.getInstance().getConf().getWorkerDnList();
+  private final CompletableFuture<Void> future;
 
-  @Override
-  public long cpuRequest(long n) {
-    long z = 1;
-    for (int i = 0; i < n; i++) {
-      z *= i;
-    }
-    return z;
+  public IOProcessHandler(CompletableFuture<Void> future) {
+    this.future = future;
   }
 
   @Override
-  public boolean ioRequest() {
-    for (TEndPoint worker : WORKERS) {
-      AsyncDNodeClientManager.getInstance().processIORequest(worker, new EmptyAsyncHandler());
-    }
-    return true;
+  public void onComplete(Void unused) {
+    this.future.complete(null);
+  }
+
+  @Override
+  public void onError(Exception e) {
+    // Do nothing
   }
 }

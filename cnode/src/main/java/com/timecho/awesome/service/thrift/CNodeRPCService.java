@@ -46,7 +46,7 @@ public class CNodeRPCService extends ThriftService implements CNodeRPCServiceMBe
         break;
       case ASYNC:
       default:
-        this.cnProcessor = new CNodeRPCAsyncServiceProcessor();
+        this.cnProcessor = new CNodeRPCAsyncServiceProcessor(this.thriftServiceThread.getExecutorService());
         super.initAsyncServiceImpl();
         break;
     }
