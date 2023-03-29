@@ -22,13 +22,18 @@ package com.timecho.awesome.service.thrift;
 import com.timecho.aweseme.thrift.ICNodeRPCService;
 import com.timecho.aweseme.thrift.TEndPoint;
 import com.timecho.awesome.client.AsyncDNodeClientManager;
-import com.timecho.awesome.client.EmptyAsyncHandler;
+import com.timecho.awesome.client.CountDownLatchAsyncHandler;
 import com.timecho.awesome.conf.CNodeDescriptor;
 import com.timecho.awesome.service.CNode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
 
 public class CNodeRPCSyncServiceProcessor implements ICNodeRPCService.Iface {
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(CNodeRPCSyncServiceProcessor.class);
 
   private static final List<TEndPoint> WORKERS = CNodeDescriptor.getInstance().getConf().getWorkerDnList();
 
@@ -43,8 +48,14 @@ public class CNodeRPCSyncServiceProcessor implements ICNodeRPCService.Iface {
 
   @Override
   public boolean ioRequest() {
+    CountDownLatch latch = new CountDownLatch(WORKERS.size());
     for (TEndPoint worker : WORKERS) {
-      AsyncDNodeClientManager.getInstance().processIORequest(worker, new EmptyAsyncHandler());
+      AsyncDNodeClientManager.getInstance().processIORequest(worker, new CountDownLatchAsyncHandler(latch));
+    }
+    try {
+      latch.await();
+    } catch (InterruptedException e) {
+      LOGGER.error("Interrupted while waiting for IO request to finish", e);
     }
     return true;
   }

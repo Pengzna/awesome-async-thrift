@@ -19,6 +19,7 @@
 
 package com.timecho.awesome.service;
 
+import com.timecho.awesome.concurrent.threadpool.WrappedThreadPoolExecutor;
 import com.timecho.awesome.conf.NodeConstant;
 import com.timecho.awesome.conf.ServiceType;
 import org.jfree.chart.ChartFactory;
@@ -53,11 +54,11 @@ public class CNodeMonitor implements IService {
   private final long systemStartTime;
 
   private final AtomicBoolean monitor;
-  private final ThreadPoolExecutor executor;
+  private final WrappedThreadPoolExecutor executor;
   // Map<timestamp, thread count>
   private final TreeMap<Long, Integer> threadCountMap;
 
-  public CNodeMonitor(long systemStartTime, ThreadPoolExecutor executor) {
+  public CNodeMonitor(long systemStartTime, WrappedThreadPoolExecutor executor) {
     this.systemStartTime = systemStartTime;
     this.monitor = new AtomicBoolean(true);
     this.executor = executor;
@@ -69,7 +70,7 @@ public class CNodeMonitor implements IService {
     CompletableFuture.runAsync(() -> {
       while (monitor.get()) {
         try {
-          TimeUnit.MILLISECONDS.sleep(1000);
+          TimeUnit.MILLISECONDS.sleep(100);
         } catch (InterruptedException e) {
           LOGGER.warn(e.getMessage());
         }
@@ -102,8 +103,7 @@ public class CNodeMonitor implements IService {
   private XYDataset createDataset() {
     XYSeries series = new XYSeries("Data");
     for (Map.Entry<Long, Integer> entry : threadCountMap.entrySet()) {
-      long currentTimeInSec = (entry.getKey() - systemStartTime) / 1000;
-      LOGGER.info("Time: {} Count: {}", currentTimeInSec, entry.getValue());
+      long currentTimeInSec = (entry.getKey() - systemStartTime);
       series.add(currentTimeInSec, entry.getValue());
     }
     XYSeriesCollection dataset = new XYSeriesCollection();

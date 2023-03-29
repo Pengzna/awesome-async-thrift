@@ -20,6 +20,7 @@
 package com.timecho.awesome.service;
 
 import com.timecho.awesome.client.AsyncDNodeClientManager;
+import com.timecho.awesome.concurrent.threadpool.WrappedThreadPoolExecutor;
 import com.timecho.awesome.conf.CNodeConfig;
 import com.timecho.awesome.conf.NodeConstant;
 import com.timecho.awesome.conf.CNodeDescriptor;
@@ -29,7 +30,6 @@ import com.timecho.awesome.service.thrift.CNodeRPCService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class CNode implements CNodeMBean {
@@ -83,7 +83,7 @@ public class CNode implements CNodeMBean {
   }
 
   private void setUpMonitorService() throws StartupException {
-    monitor = new CNodeMonitor(SYSTEM_START_TIME, (ThreadPoolExecutor) rpcService.getExecutorService());
+    monitor = new CNodeMonitor(SYSTEM_START_TIME, (WrappedThreadPoolExecutor) rpcService.getExecutorService());
     registerManager.register(monitor);
     LOGGER.info("Successfully setup {}.", ServiceType.CNODE_MONITOR.getName());
   }
