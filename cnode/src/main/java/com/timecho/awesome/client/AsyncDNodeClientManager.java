@@ -67,7 +67,6 @@ public class AsyncDNodeClientManager {
 
   public void processIORequest(TEndPoint worker, AsyncMethodCallback<Void> handler) {
     try {
-      LOGGER.info("Send IOProcess to worker: {}", worker);
       AsyncDNodeServiceClient client = clientManager.borrowClient(worker);
       client.processIO(handler);
     } catch (ClientManagerException | TException e) {

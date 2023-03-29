@@ -23,6 +23,7 @@ public enum ServiceType {
 
   JMX_SERVICE("JMXService", "JMXService"),
   CNODE_SERVICE("CNodeRPCService", "CNodeRPCService"),
+  CNODE_MONITOR("CNodeMonitor", "CNodeMonitor"),
   DNODE_SERVICE("DNodeRPCService", "DNodeRPCService");
 
   private final String name;

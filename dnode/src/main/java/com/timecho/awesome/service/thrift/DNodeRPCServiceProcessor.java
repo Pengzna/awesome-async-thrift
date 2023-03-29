@@ -26,11 +26,15 @@ import com.timecho.awesome.conf.DNodeConfig;
 import com.timecho.awesome.conf.DNodeDescriptor;
 import com.timecho.awesome.conf.NodeConstant;
 import com.timecho.awesome.conf.RequestType;
+import com.timecho.awesome.service.DNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.TimeUnit;
 
 public class DNodeRPCServiceProcessor implements IDNodeRPCService.Iface {
@@ -47,35 +51,41 @@ public class DNodeRPCServiceProcessor implements IDNodeRPCService.Iface {
     LOGGER.info(String.format("\t %s: %s", NodeConstant.DN_CONCURRENT_CLIENT_NUM, CONF.getDnClientNum()));
     LOGGER.info(String.format("\t %s: %s", NodeConstant.DN_REQUEST_NUM_PER_CLIENT, CONF.getDnRequestNum()));
 
-    final int clientNum = CONF.getDnClientNum();
-    final int requestNum = CONF.getDnRequestNum();
-    final RequestType requestType = CONF.getRequestType();
-    for (int i = 0; i < clientNum; i++) {
-      CompletableFuture.runAsync(() -> {
-        for (int request = 0; request < requestNum; request++) {
-          switch (requestType) {
-            case CPU:
-              SyncCNodeClientManager.getInstance().cpuRequest();
-              LOGGER.info("CPU request completed");
-              break;
-            case IO:
-            default:
-              SyncCNodeClientManager.getInstance().ioRequest();
-              LOGGER.info("IO request completed");
-              break;
+    CompletableFuture.runAsync(() -> {
+      final int clientNum = CONF.getDnClientNum();
+      final int requestNum = CONF.getDnRequestNum();
+      final RequestType requestType = CONF.getRequestType();
+      List<CompletableFuture<Void>> clientFutures = new ArrayList<>();
+      for (int i = 0; i < clientNum; i++) {
+        clientFutures.add(CompletableFuture.runAsync(() -> {
+          for (int request = 0; request < requestNum; request++) {
+            switch (requestType) {
+              case CPU:
+                SyncCNodeClientManager.getInstance().cpuRequest();
+                break;
+              case IO:
+              default:
+                SyncCNodeClientManager.getInstance().ioRequest();
+                break;
+            }
           }
-        }
+        }));
+      }
+
+      CompletableFuture<Void> commitFuture =
+        CompletableFuture.allOf(clientFutures.toArray(new CompletableFuture[0]));
+      commitFuture.thenRun(() -> {
+        SyncCNodeClientManager.getInstance().commit();
+        DNode.getInstance().deactivate();
       });
-    }
+    });
   }
 
   @Override
   public void processIO() {
     try {
-      LOGGER.info("Processing IO");
       // Randomly sleeping for [500, 1000) ms
       TimeUnit.MILLISECONDS.sleep(500 + new Random().nextInt(500));
-      LOGGER.info("IO processing completed");
     } catch (InterruptedException e) {
       LOGGER.warn("Error when executing processIO", e);
     }

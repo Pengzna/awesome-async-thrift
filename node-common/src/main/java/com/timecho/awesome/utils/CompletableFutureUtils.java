@@ -17,31 +17,31 @@
  * under the License.
  */
 
-package com.timecho.awesome.client;
+package com.timecho.awesome.utils;
 
 import org.apache.thrift.async.AsyncMethodCallback;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.function.Supplier;
 
-public class IOProcessHandler implements AsyncMethodCallback<Void> {
+public class CompletableFutureUtils {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(IOProcessHandler.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(CompletableFutureUtils.class);
 
-  private final CompletableFuture<Void> future;
+  private static ExecutorService EXECUTOR_SERVICE;
 
-  public IOProcessHandler(CompletableFuture<Void> future) {
-    this.future = future;
+  public void setExecutorService(ExecutorService executorService) {
+    CompletableFutureUtils.EXECUTOR_SERVICE = executorService;
   }
 
-  @Override
-  public void onComplete(Void unused) {
-    this.future.complete(null);
+  public static <T>CompletableFuture<T> supplyAsync(Supplier<T> supplier) {
+    return CompletableFuture.supplyAsync(supplier, EXECUTOR_SERVICE);
   }
 
-  @Override
-  public void onError(Exception e) {
-    // Do nothing
+  public static CompletableFuture<Void> runAsync(Runnable runnable) {
+    return CompletableFuture.runAsync(runnable, EXECUTOR_SERVICE);
   }
 }

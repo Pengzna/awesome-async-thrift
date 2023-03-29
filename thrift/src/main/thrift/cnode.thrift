@@ -24,4 +24,6 @@ service ICNodeRPCService {
   i64 cpuRequest(i64 n)
 
   bool ioRequest()
+
+  bool commitDNode()
 }

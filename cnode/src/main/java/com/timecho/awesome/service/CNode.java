@@ -29,6 +29,9 @@ import com.timecho.awesome.service.thrift.CNodeRPCService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.atomic.AtomicInteger;
+
 public class CNode implements CNodeMBean {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(CNode.class);
@@ -37,9 +40,14 @@ public class CNode implements CNodeMBean {
       "%s:%s=%s",
       this.getClass().getPackage(), NodeConstant.JMX_TYPE, NodeConstant.CNODE);
 
-  private final RegisterManager registerManager = new RegisterManager();
-
   private static final CNodeConfig CONF = CNodeDescriptor.getInstance().getConf();
+  private static final long SYSTEM_START_TIME = System.currentTimeMillis();
+
+  private final RegisterManager registerManager = new RegisterManager();
+  private CNodeRPCService rpcService;
+  private CNodeMonitor monitor;
+
+  private final AtomicInteger committedDNodeNum = new AtomicInteger(0);
 
   public static void main(String[] args) {
     LOGGER.info("{} environmental variables: {}",
@@ -52,6 +60,7 @@ public class CNode implements CNodeMBean {
     try {
       setUpJMXService();
       setUpRPCService();
+      setUpMonitorService();
     } catch (StartupException e) {
       LOGGER.error("Meet error when startup.", e);
       deactivate();
@@ -68,9 +77,15 @@ public class CNode implements CNodeMBean {
   }
 
   private void setUpRPCService() throws StartupException {
-    CNodeRPCService cNodeRPCService = new CNodeRPCService();
-    registerManager.register(cNodeRPCService);
+    rpcService = new CNodeRPCService();
+    registerManager.register(rpcService);
     LOGGER.info("Successfully setup {}.", ServiceType.CNODE_SERVICE.getName());
+  }
+
+  private void setUpMonitorService() throws StartupException {
+    monitor = new CNodeMonitor(SYSTEM_START_TIME, (ThreadPoolExecutor) rpcService.getExecutorService());
+    registerManager.register(monitor);
+    LOGGER.info("Successfully setup {}.", ServiceType.CNODE_MONITOR.getName());
   }
 
   private void logTestConfigurations() {
@@ -82,7 +97,17 @@ public class CNode implements CNodeMBean {
     LOGGER.info(String.format("\t %s: %s", NodeConstant.DN_REQUEST_NUM_PER_CLIENT, CONF.getDnRequestNumPerClient()));
   }
 
-  private void deactivate() {
+
+  public void commitDNode() {
+    if (committedDNodeNum.incrementAndGet() == CONF.getWorkerDnList().size()) {
+      LOGGER.info("All {} DNodes have committed.", committedDNodeNum.get());
+      monitor.stop();
+    } else {
+      LOGGER.info("{} DNodes have committed.", committedDNodeNum.get());
+    }
+  }
+
+  public void deactivate() {
     LOGGER.warn("Deactivating {}...", NodeConstant.CNODE);
     registerManager.deregisterAll();
     JMXService.deregisterMBean(mbeanName);

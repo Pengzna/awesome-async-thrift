@@ -27,6 +27,9 @@ import com.timecho.awesome.conf.NodeConstant;
 import com.timecho.awesome.conf.ServiceType;
 import org.apache.thrift.TBaseAsyncProcessor;
 
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ThreadPoolExecutor;
+
 public class CNodeRPCService extends ThriftService implements CNodeRPCServiceMBean {
 
   private final static CNodeConfig CONF = CNodeDescriptor.getInstance().getConf();
@@ -106,11 +109,15 @@ public class CNodeRPCService extends ThriftService implements CNodeRPCServiceMBe
             NodeConstant.CONNECTION_TIMEOUT_IN_MS,
             NodeConstant.THRIFT_FRAME_MAX_SIZE);
         ((CNodeRPCAsyncServiceProcessor) cnProcessor)
-          .setExecutorService(this.thriftServiceThread.getExecutorService());
+          .setExecutorService((ThreadPoolExecutor) this.thriftServiceThread.getExecutorService());
         break;
     }
 
     thriftServiceThread.setName(ServiceType.CNODE_SERVICE.getName());
+  }
+
+  public ExecutorService getExecutorService() {
+    return this.thriftServiceThread.getExecutorService();
   }
 
   @Override

@@ -48,7 +48,6 @@ public class SyncCNodeClientManager {
   public void ioRequest() {
     final TEndPoint targetCNode = CONF.getTargetCNode();
     try (SyncCNodeServiceClient client = clientManager.borrowClient(targetCNode)) {
-      LOGGER.info("Start to execute ioRequest");
       client.ioRequest();
     } catch (TException | ClientManagerException e) {
       LOGGER.error("Error when executing ioRequest", e);
@@ -64,6 +63,15 @@ public class SyncCNodeClientManager {
       client.cpuRequest(base + new Random().nextInt(offset));
     } catch (TException | ClientManagerException e) {
       LOGGER.error("Error when executing ioRequest", e);
+    }
+  }
+
+  public void commit() {
+    final TEndPoint targetCNode = CONF.getTargetCNode();
+    try (SyncCNodeServiceClient client = clientManager.borrowClient(targetCNode)) {
+      client.commitDNode();
+    } catch (TException | ClientManagerException e) {
+      LOGGER.error("Error when executing commitDNode", e);
     }
   }
 

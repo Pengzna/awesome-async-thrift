@@ -67,7 +67,7 @@ public class DNode implements DNodeMBean {
     LOGGER.info("Successfully setup {}.", ServiceType.DNODE_SERVICE.getName());
   }
 
-  private void deactivate() {
+  public void deactivate() {
     LOGGER.warn("Deactivating {}...", NodeConstant.DNODE);
     registerManager.deregisterAll();
     JMXService.deregisterMBean(mbeanName);

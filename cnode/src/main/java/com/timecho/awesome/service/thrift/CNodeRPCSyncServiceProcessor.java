@@ -24,6 +24,7 @@ import com.timecho.aweseme.thrift.TEndPoint;
 import com.timecho.awesome.client.AsyncDNodeClientManager;
 import com.timecho.awesome.client.EmptyAsyncHandler;
 import com.timecho.awesome.conf.CNodeDescriptor;
+import com.timecho.awesome.service.CNode;
 
 import java.util.List;
 
@@ -45,6 +46,12 @@ public class CNodeRPCSyncServiceProcessor implements ICNodeRPCService.Iface {
     for (TEndPoint worker : WORKERS) {
       AsyncDNodeClientManager.getInstance().processIORequest(worker, new EmptyAsyncHandler());
     }
+    return true;
+  }
+
+  @Override
+  public boolean commitDNode() {
+    CNode.getInstance().commitDNode();
     return true;
   }
 }
