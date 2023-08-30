@@ -48,6 +48,7 @@ public class CNodeRPCSyncServiceProcessor implements ICNodeRPCService.Iface {
 
   @Override
   public boolean ioRequest() {
+    LOGGER.info("CNode: ioRequest");
     CountDownLatch latch = new CountDownLatch(WORKERS.size());
     for (TEndPoint worker : WORKERS) {
       AsyncDNodeClientManager.getInstance().processIORequest(worker, new CountDownLatchAsyncHandler(latch));

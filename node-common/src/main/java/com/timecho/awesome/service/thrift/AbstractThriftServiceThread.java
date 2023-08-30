@@ -30,42 +30,90 @@ import org.apache.thrift.server.TServer;
 import org.apache.thrift.server.TServerEventHandler;
 import org.apache.thrift.server.TThreadPoolServer;
 import org.apache.thrift.server.TThreadedSelectorServer;
-import org.apache.thrift.transport.TNonblockingServerSocket;
-import org.apache.thrift.transport.TNonblockingServerTransport;
-import org.apache.thrift.transport.TServerSocket;
-import org.apache.thrift.transport.TServerTransport;
-import org.apache.thrift.transport.TTransportException;
-import org.apache.thrift.transport.TTransportFactory;
+import org.apache.thrift.transport.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.InetSocketAddress;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.TimeUnit;
 
 public abstract class AbstractThriftServiceThread extends Thread {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(AbstractThriftServiceThread.class);
+  // currently, we can reuse the ProtocolFactory instance.
+  private static final TCompactProtocol.Factory compactProtocolFactory =
+      new TCompactProtocol.Factory();
+  private static final TBinaryProtocol.Factory binaryProtocolFactory =
+      new TBinaryProtocol.Factory();
+  private final String serviceName;
   private TServerTransport serverTransport;
   private TServer poolServer;
   private CountDownLatch threadStopLatch;
-
   private ExecutorService executorService;
-
-  private final String serviceName;
-
   private TProtocolFactory protocolFactory;
 
-  // currently, we can reuse the ProtocolFactory instance.
-  private static final TCompactProtocol.Factory compactProtocolFactory = new TCompactProtocol.Factory();
-  private static final TBinaryProtocol.Factory binaryProtocolFactory = new TBinaryProtocol.Factory();
-
-  private void initProtocolFactory(boolean compress) {
-    protocolFactory = getProtocolFactory(compress);
+  /** For async ThriftService. */
+  protected AbstractThriftServiceThread(
+      TBaseAsyncProcessor<?> processor,
+      String serviceName,
+      String threadsName,
+      String bindAddress,
+      int port,
+      int selectorThreads,
+      int minWorkerThreads,
+      int maxWorkerThreads,
+      int timeoutSecond,
+      TServerEventHandler serverEventHandler,
+      boolean compress,
+      int connectionTimeoutInMS,
+      int maxReadBufferBytes) {
+    initProtocolFactory(compress);
+    this.serviceName = serviceName;
+    try {
+      serverTransport = openNonblockingTransport(bindAddress, port, connectionTimeoutInMS);
+      TThreadedSelectorServer.Args poolArgs =
+          initAsyncedSelectorPoolArgs(
+              processor,
+              threadsName,
+              selectorThreads,
+              minWorkerThreads,
+              maxWorkerThreads,
+              timeoutSecond,
+              maxReadBufferBytes);
+      poolServer = new TThreadedSelectorServer(poolArgs);
+      poolServer.setServerEventHandler(serverEventHandler);
+    } catch (TTransportException e) {
+      catchFailedInitialization(e);
+    }
   }
 
-  public abstract TTransportFactory getTTransportFactory();
+  /** For sync ThriftServiceThread */
+  protected AbstractThriftServiceThread(
+      TProcessor processor,
+      String serviceName,
+      String threadsName,
+      String bindAddress,
+      int port,
+      int minWorkerThreads,
+      int maxWorkerThreads,
+      int timeoutSecond,
+      TServerEventHandler serverEventHandler,
+      boolean compress) {
+    initProtocolFactory(compress);
+    this.serviceName = serviceName;
+
+    try {
+      serverTransport = openTransport(bindAddress, port);
+      TThreadPoolServer.Args poolArgs =
+          initSyncedPoolArgs(
+              processor, threadsName, minWorkerThreads, maxWorkerThreads, timeoutSecond);
+      poolServer = new TThreadPoolServer(poolArgs);
+      poolServer.setServerEventHandler(serverEventHandler);
+    } catch (TTransportException e) {
+      catchFailedInitialization(e);
+    }
+  }
 
   public static TProtocolFactory getProtocolFactory(boolean compress) {
     if (compress) {
@@ -75,56 +123,28 @@ public abstract class AbstractThriftServiceThread extends Thread {
     }
   }
 
-  /** For async ThriftService. */
-  protected AbstractThriftServiceThread(
-    TBaseAsyncProcessor<?> processor,
-    String serviceName,
-    String threadsName,
-    String bindAddress,
-    int port,
-    int selectorThreads,
-    int minWorkerThreads,
-    int maxWorkerThreads,
-    int timeoutSecond,
-    TServerEventHandler serverEventHandler,
-    boolean compress,
-    int connectionTimeoutInMS,
-    int maxReadBufferBytes) {
-    initProtocolFactory(compress);
-    this.serviceName = serviceName;
-    try {
-      serverTransport = openNonblockingTransport(bindAddress, port, connectionTimeoutInMS);
-      TThreadedSelectorServer.Args poolArgs =
-        initAsyncedSelectorPoolArgs(
-          processor,
-          threadsName,
-          selectorThreads,
-          minWorkerThreads,
-          maxWorkerThreads,
-          timeoutSecond,
-          maxReadBufferBytes);
-      poolServer = new TThreadedSelectorServer(poolArgs);
-      poolServer.setServerEventHandler(serverEventHandler);
-    } catch (TTransportException e) {
-      catchFailedInitialization(e);
-    }
+  private void initProtocolFactory(boolean compress) {
+    protocolFactory = getProtocolFactory(compress);
   }
 
+  public abstract TTransportFactory getTTransportFactory();
+
   private TThreadedSelectorServer.Args initAsyncedSelectorPoolArgs(
-    TBaseAsyncProcessor<?> processor,
-    String threadsName,
-    int selectorThreads,
-    int minWorkerThreads,
-    int maxWorkerThreads,
-    int timeoutSecond,
-    int maxReadBufferBytes) {
+      TBaseAsyncProcessor<?> processor,
+      String threadsName,
+      int selectorThreads,
+      int minWorkerThreads,
+      int maxWorkerThreads,
+      int timeoutSecond,
+      int maxReadBufferBytes) {
     TThreadedSelectorServer.Args poolArgs =
-      new TThreadedSelectorServer.Args((TNonblockingServerTransport) serverTransport);
+        new TThreadedSelectorServer.Args((TNonblockingServerTransport) serverTransport);
     poolArgs.maxReadBufferBytes = maxReadBufferBytes;
     poolArgs.selectorThreads(selectorThreads);
-    executorService =
-      ThreadPoolFactory.createThriftRpcClientThreadPool(
-        minWorkerThreads, maxWorkerThreads, timeoutSecond, TimeUnit.SECONDS, threadsName);
+    executorService = ThreadPoolFactory.createThriftRpcClientThreadPool();
+    //    executorService =
+    //      ThreadPoolFactory.createThriftRpcClientThreadPool(
+    //        minWorkerThreads, maxWorkerThreads, timeoutSecond, TimeUnit.SECONDS, threadsName);
     poolArgs.executorService(executorService);
     poolArgs.processor(processor);
     poolArgs.protocolFactory(protocolFactory);
@@ -132,39 +152,17 @@ public abstract class AbstractThriftServiceThread extends Thread {
     return poolArgs;
   }
 
-  /** For sync ThriftServiceThread */
-  protected AbstractThriftServiceThread(
-    TProcessor processor,
-    String serviceName,
-    String threadsName,
-    String bindAddress,
-    int port,
-    int minWorkerThreads,
-    int maxWorkerThreads,
-    int timeoutSecond,
-    TServerEventHandler serverEventHandler,
-    boolean compress) {
-    initProtocolFactory(compress);
-    this.serviceName = serviceName;
-
-    try {
-      serverTransport = openTransport(bindAddress, port);
-      TThreadPoolServer.Args poolArgs =
-        initSyncedPoolArgs(processor, threadsName, minWorkerThreads, maxWorkerThreads, timeoutSecond);
-      poolServer = new TThreadPoolServer(poolArgs);
-      poolServer.setServerEventHandler(serverEventHandler);
-    } catch (TTransportException e) {
-      catchFailedInitialization(e);
-    }
-  }
-
   private TThreadPoolServer.Args initSyncedPoolArgs(
-    TProcessor processor, String threadsName, int minWorkerThreads, int maxWorkerThreads, int timeoutSecond) {
+      TProcessor processor,
+      String threadsName,
+      int minWorkerThreads,
+      int maxWorkerThreads,
+      int timeoutSecond) {
     TThreadPoolServer.Args poolArgs = new TThreadPoolServer.Args(serverTransport);
     poolArgs
-      .minWorkerThreads(minWorkerThreads)
-      .maxWorkerThreads(maxWorkerThreads)
-      .stopTimeoutVal(timeoutSecond);
+        .minWorkerThreads(minWorkerThreads)
+        .maxWorkerThreads(maxWorkerThreads)
+        .stopTimeoutVal(timeoutSecond);
     executorService = ThreadPoolFactory.createThriftRpcClientThreadPool(poolArgs, threadsName);
     poolArgs.executorService = executorService;
     poolArgs.processor(processor);
@@ -178,9 +176,9 @@ public abstract class AbstractThriftServiceThread extends Thread {
   }
 
   private TServerTransport openNonblockingTransport(
-    String bindAddress, int port, int connectionTimeoutInMS) throws TTransportException {
+      String bindAddress, int port, int connectionTimeoutInMS) throws TTransportException {
     return new TNonblockingServerSocket(
-      new InetSocketAddress(bindAddress, port), connectionTimeoutInMS);
+        new InetSocketAddress(bindAddress, port), connectionTimeoutInMS);
   }
 
   public void setThreadStopLatch(CountDownLatch threadStopLatch) {
@@ -193,8 +191,7 @@ public abstract class AbstractThriftServiceThread extends Thread {
     try {
       poolServer.serve();
     } catch (Exception e) {
-      throw new RPCServiceException(
-        String.format("%s exit, because ", serviceName), e);
+      throw new RPCServiceException(String.format("%s exit, because ", serviceName), e);
     } finally {
       close();
       if (threadStopLatch == null) {
@@ -206,9 +203,7 @@ public abstract class AbstractThriftServiceThread extends Thread {
       if (threadStopLatch != null && threadStopLatch.getCount() == 1) {
         threadStopLatch.countDown();
       }
-      LOGGER.debug(
-        "Close TThreadPoolServer and TServerSocket for {}",
-        serviceName);
+      LOGGER.debug("Close TThreadPoolServer and TServerSocket for {}", serviceName);
     }
   }
 
@@ -222,13 +217,8 @@ public abstract class AbstractThriftServiceThread extends Thread {
     if (threadStopLatch != null && threadStopLatch.getCount() == 1) {
       threadStopLatch.countDown();
     }
-    LOGGER.debug(
-      "Close TThreadPoolServer and TServerSocket for {}",
-      serviceName);
-    throw new RPCServiceException(
-      String.format(
-        "Failed to start %s, because ", serviceName),
-      e);
+    LOGGER.debug("Close TThreadPoolServer and TServerSocket for {}", serviceName);
+    throw new RPCServiceException(String.format("Failed to start %s, because ", serviceName), e);
   }
 
   public synchronized void close() {

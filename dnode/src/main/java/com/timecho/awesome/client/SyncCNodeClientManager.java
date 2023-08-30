@@ -46,6 +46,7 @@ public class SyncCNodeClientManager {
   }
 
   public void ioRequest() {
+    // TODO: 服务发现？
     final TEndPoint targetCNode = CONF.getTargetCNode();
     try (SyncCNodeServiceClient client = clientManager.borrowClient(targetCNode)) {
       client.ioRequest();

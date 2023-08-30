@@ -34,7 +34,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.TimeUnit;
 
 public class DNodeRPCServiceProcessor implements IDNodeRPCService.Iface {
@@ -46,39 +45,44 @@ public class DNodeRPCServiceProcessor implements IDNodeRPCService.Iface {
   @Override
   public void activateDNode(TDNodeConfiguration configuration) {
     DNodeDescriptor.loadTestConfig(configuration);
+    LOGGER.info("DNode: be activated.");
     LOGGER.info("This test will run in the following configurations:");
     LOGGER.info(String.format("\t %s: %s", NodeConstant.REQUEST_TYPE, CONF.getRequestType()));
     LOGGER.info(String.format("\t %s: %s", NodeConstant.DN_CONCURRENT_CLIENT_NUM, CONF.getDnClientNum()));
     LOGGER.info(String.format("\t %s: %s", NodeConstant.DN_REQUEST_NUM_PER_CLIENT, CONF.getDnRequestNum()));
 
-    CompletableFuture.runAsync(() -> {
-      final int clientNum = CONF.getDnClientNum();
-      final int requestNum = CONF.getDnRequestNum();
-      final RequestType requestType = CONF.getRequestType();
-      List<CompletableFuture<Void>> clientFutures = new ArrayList<>();
-      for (int i = 0; i < clientNum; i++) {
-        clientFutures.add(CompletableFuture.runAsync(() -> {
-          for (int request = 0; request < requestNum; request++) {
-            switch (requestType) {
-              case CPU:
-                SyncCNodeClientManager.getInstance().cpuRequest();
-                break;
-              case IO:
-              default:
-                SyncCNodeClientManager.getInstance().ioRequest();
-                break;
-            }
+    CompletableFuture.runAsync(
+        () -> {
+          final int clientNum = CONF.getDnClientNum();
+          final int requestNum = CONF.getDnRequestNum();
+          final RequestType requestType = CONF.getRequestType();
+          List<CompletableFuture<Void>> clientFutures = new ArrayList<>();
+          for (int i = 0; i < clientNum; i++) {
+            clientFutures.add(
+                CompletableFuture.runAsync(
+                    () -> {
+                      for (int request = 0; request < requestNum; request++) {
+                        switch (requestType) {
+                          case CPU:
+                            SyncCNodeClientManager.getInstance().cpuRequest();
+                            break;
+                          case IO:
+                          default:
+                            SyncCNodeClientManager.getInstance().ioRequest();
+                            break;
+                        }
+                      }
+                    }));
           }
-        }));
-      }
 
-      CompletableFuture<Void> commitFuture =
-        CompletableFuture.allOf(clientFutures.toArray(new CompletableFuture[0]));
-      commitFuture.thenRun(() -> {
-        SyncCNodeClientManager.getInstance().commit();
-        DNode.getInstance().deactivate();
-      });
-    });
+          CompletableFuture<Void> commitFuture =
+              CompletableFuture.allOf(clientFutures.toArray(new CompletableFuture[0])); // 创建一个空数组
+          commitFuture.thenRun(
+              () -> {
+                SyncCNodeClientManager.getInstance().commit();
+                DNode.getInstance().deactivate();
+              });
+        });
   }
 
   @Override
@@ -86,6 +90,7 @@ public class DNodeRPCServiceProcessor implements IDNodeRPCService.Iface {
     try {
       // Randomly sleeping for [500, 1000) ms
       TimeUnit.MILLISECONDS.sleep(500 + new Random().nextInt(500));
+      LOGGER.info("Dnode: process IO");
     } catch (InterruptedException e) {
       LOGGER.warn("Error when executing processIO", e);
     }

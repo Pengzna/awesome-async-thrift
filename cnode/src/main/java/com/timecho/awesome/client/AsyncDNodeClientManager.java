@@ -31,6 +31,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
+import java.util.concurrent.atomic.DoubleAdder;
 
 public class AsyncDNodeClientManager {
 
@@ -47,6 +48,10 @@ public class AsyncDNodeClientManager {
       new IClientManager.Factory<TEndPoint, AsyncDNodeServiceClient>()
         .createClientManager(
           new ClientPoolFactory.AsyncDNodeServiceClientPoolFactory());
+  }
+
+  public static AsyncDNodeClientManager getInstance() {
+    return AsyncDNodeClientPoolHolder.INSTANCE;
   }
 
   public void activateClusterDNodes() {
@@ -81,9 +86,5 @@ public class AsyncDNodeClientManager {
     private AsyncDNodeClientPoolHolder() {
       // Empty constructor
     }
-  }
-
-  public static AsyncDNodeClientManager getInstance() {
-    return AsyncDNodeClientPoolHolder.INSTANCE;
   }
 }

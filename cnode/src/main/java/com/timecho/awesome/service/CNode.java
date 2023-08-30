@@ -22,8 +22,8 @@ package com.timecho.awesome.service;
 import com.timecho.awesome.client.AsyncDNodeClientManager;
 import com.timecho.awesome.concurrent.threadpool.WrappedThreadPoolExecutor;
 import com.timecho.awesome.conf.CNodeConfig;
-import com.timecho.awesome.conf.NodeConstant;
 import com.timecho.awesome.conf.CNodeDescriptor;
+import com.timecho.awesome.conf.NodeConstant;
 import com.timecho.awesome.conf.ServiceType;
 import com.timecho.awesome.exception.StartupException;
 import com.timecho.awesome.service.thrift.CNodeRPCService;
@@ -35,32 +35,38 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class CNode implements CNodeMBean {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(CNode.class);
-  private final String mbeanName =
-    String.format(
-      "%s:%s=%s",
-      this.getClass().getPackage(), NodeConstant.JMX_TYPE, NodeConstant.CNODE);
-
   private static final CNodeConfig CONF = CNodeDescriptor.getInstance().getConf();
   private static final long SYSTEM_START_TIME = System.currentTimeMillis();
-
+  private final String mbeanName =
+      String.format(
+          "%s:%s=%s", this.getClass().getPackage(), NodeConstant.JMX_TYPE, NodeConstant.CNODE);
   private final RegisterManager registerManager = new RegisterManager();
+  private final AtomicInteger committedDNodeNum = new AtomicInteger(0);
   private CNodeRPCService rpcService;
   private CNodeMonitor monitor;
 
-  private final AtomicInteger committedDNodeNum = new AtomicInteger(0);
+  private CNode() {
+    // Empty constructor
+  }
 
   public static void main(String[] args) {
-    LOGGER.info("{} environmental variables: {}",
-      NodeConstant.CNODE, CNodeDescriptor.getEnvironmentalVariables());
+    LOGGER.info(
+        "{} environmental variables: {}",
+        NodeConstant.CNODE,
+        CNodeDescriptor.getEnvironmentalVariables());
     LOGGER.info("Activating {}...", NodeConstant.CNODE);
     CNode.getInstance().activate();
+  }
+
+  public static CNode getInstance() {
+    return CNodeHolder.INSTANCE;
   }
 
   private void activate() {
     try {
       setUpJMXService();
       setUpRPCService();
-      setUpMonitorService();
+      //      setUpMonitorService();
     } catch (StartupException e) {
       LOGGER.error("Meet error when startup.", e);
       deactivate();
@@ -83,7 +89,9 @@ public class CNode implements CNodeMBean {
   }
 
   private void setUpMonitorService() throws StartupException {
-    monitor = new CNodeMonitor(SYSTEM_START_TIME, (WrappedThreadPoolExecutor) rpcService.getExecutorService());
+    monitor =
+        new CNodeMonitor(
+            SYSTEM_START_TIME, (WrappedThreadPoolExecutor) rpcService.getExecutorService());
     registerManager.register(monitor);
     LOGGER.info("Successfully setup {}.", ServiceType.CNODE_MONITOR.getName());
   }
@@ -91,12 +99,18 @@ public class CNode implements CNodeMBean {
   private void logTestConfigurations() {
     LOGGER.info("This test will run in the following configurations:");
     LOGGER.info(String.format("\t %s: %s", NodeConstant.CN_SERVER_TYPE, CONF.getCnServerType()));
-    LOGGER.info(String.format("\t %s: %s", NodeConstant.CN_ASYNC_SERVICE_SELECTOR_NUM, CONF.getCnAsyncServiceSelectorNum()));
+    LOGGER.info(
+        String.format(
+            "\t %s: %s",
+            NodeConstant.CN_ASYNC_SERVICE_SELECTOR_NUM, CONF.getCnAsyncServiceSelectorNum()));
     LOGGER.info(String.format("\t %s: %s", NodeConstant.REQUEST_TYPE, CONF.getRequestType()));
-    LOGGER.info(String.format("\t %s: %s", NodeConstant.DN_CONCURRENT_CLIENT_NUM, CONF.getDnConcurrentClientNum()));
-    LOGGER.info(String.format("\t %s: %s", NodeConstant.DN_REQUEST_NUM_PER_CLIENT, CONF.getDnRequestNumPerClient()));
+    LOGGER.info(
+        String.format(
+            "\t %s: %s", NodeConstant.DN_CONCURRENT_CLIENT_NUM, CONF.getDnConcurrentClientNum()));
+    LOGGER.info(
+        String.format(
+            "\t %s: %s", NodeConstant.DN_REQUEST_NUM_PER_CLIENT, CONF.getDnRequestNumPerClient()));
   }
-
 
   public void commitDNode() {
     if (committedDNodeNum.incrementAndGet() == CONF.getWorkerDnList().size()) {
@@ -115,10 +129,6 @@ public class CNode implements CNodeMBean {
     System.exit(-1);
   }
 
-  private CNode() {
-    // Empty constructor
-  }
-
   private static class CNodeHolder {
 
     private static final CNode INSTANCE = new CNode();
@@ -126,9 +136,5 @@ public class CNode implements CNodeMBean {
     private CNodeHolder() {
       // Empty constructor
     }
-  }
-
-  public static CNode getInstance() {
-    return CNodeHolder.INSTANCE;
   }
 }

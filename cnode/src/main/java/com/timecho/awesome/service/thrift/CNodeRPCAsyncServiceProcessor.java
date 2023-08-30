@@ -32,51 +32,65 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.ExecutorService;
 
 public class CNodeRPCAsyncServiceProcessor implements ICNodeRPCService.AsyncIface {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(CNodeRPCAsyncServiceProcessor.class);
 
-  private static final List<TEndPoint> WORKERS = CNodeDescriptor.getInstance().getConf().getWorkerDnList();
+  private static final List<TEndPoint> WORKERS =
+      CNodeDescriptor.getInstance().getConf().getWorkerDnList();
 
-  private ThreadPoolExecutor executorService;
+  //  private ThreadPoolExecutor executorService;
+  private ExecutorService executorService;
 
-  public void setExecutorService(ThreadPoolExecutor executorService) {
+  //  public void setExecutorService(ThreadPoolExecutor executorService) {
+  //    this.executorService = executorService;
+  //  }
+
+  public void setExecutorService(ExecutorService executorService) {
     this.executorService = executorService;
   }
 
   @Override
   public void cpuRequest(long n, AsyncMethodCallback<Long> resultHandler) {
-    CompletableFuture<Long> cpuFuture = CompletableFuture.supplyAsync(() -> {
-      long z = 1;
-      for (int i = 0; i < n; i++) {
-        z *= i;
-      }
-      return z;
-    }, executorService);
+    LOGGER.info("CNode: cpuRequest");
+    CompletableFuture<Long> cpuFuture =
+        CompletableFuture.supplyAsync(
+            () -> {
+              long z = 1;
+              for (int i = 0; i < n; i++) {
+                z *= i;
+              }
+              return z;
+            },
+            executorService);
     cpuFuture.thenAccept(resultHandler::onComplete);
   }
 
   @Override
   public void ioRequest(AsyncMethodCallback<Boolean> resultHandler) {
+    LOGGER.info("CNode: ioRequest");
     List<CompletableFuture<Void>> ioFutures = new ArrayList<>();
     for (TEndPoint worker : WORKERS) {
       CompletableFuture<Void> ioCallback = new CompletableFuture<>();
       IOProcessHandler ioProcessHandler = new IOProcessHandler(ioCallback);
-      CompletableFuture.runAsync(() ->
-        AsyncDNodeClientManager.getInstance().processIORequest(worker, ioProcessHandler), executorService);
+      CompletableFuture.runAsync(
+          () -> AsyncDNodeClientManager.getInstance().processIORequest(worker, ioProcessHandler),
+          executorService);
       ioFutures.add(ioCallback);
     }
 
-    CompletableFuture<Void> allFutures = CompletableFuture.allOf(ioFutures.toArray(new CompletableFuture[0]));
+    CompletableFuture<Void> allFutures =
+        CompletableFuture.allOf(ioFutures.toArray(new CompletableFuture[0]));
     allFutures.thenRun(() -> resultHandler.onComplete(true));
   }
 
   @Override
   public void commitDNode(AsyncMethodCallback<Boolean> resultHandler) {
+    LOGGER.info("CNode: commitDNode");
     CompletableFuture<Void> commitFuture =
-      CompletableFuture.runAsync(() -> CNode.getInstance().commitDNode(), executorService);
+        CompletableFuture.runAsync(() -> CNode.getInstance().commitDNode(), executorService);
     commitFuture.thenRun(() -> resultHandler.onComplete(true));
   }
 

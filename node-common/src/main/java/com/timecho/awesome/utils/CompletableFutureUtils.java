@@ -19,7 +19,6 @@
 
 package com.timecho.awesome.utils;
 
-import org.apache.thrift.async.AsyncMethodCallback;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,15 +32,15 @@ public class CompletableFutureUtils {
 
   private static ExecutorService EXECUTOR_SERVICE;
 
-  public void setExecutorService(ExecutorService executorService) {
-    CompletableFutureUtils.EXECUTOR_SERVICE = executorService;
-  }
-
-  public static <T>CompletableFuture<T> supplyAsync(Supplier<T> supplier) {
+  public static <T> CompletableFuture<T> supplyAsync(Supplier<T> supplier) {
     return CompletableFuture.supplyAsync(supplier, EXECUTOR_SERVICE);
   }
 
   public static CompletableFuture<Void> runAsync(Runnable runnable) {
     return CompletableFuture.runAsync(runnable, EXECUTOR_SERVICE);
+  }
+
+  public void setExecutorService(ExecutorService executorService) {
+    CompletableFutureUtils.EXECUTOR_SERVICE = executorService;
   }
 }

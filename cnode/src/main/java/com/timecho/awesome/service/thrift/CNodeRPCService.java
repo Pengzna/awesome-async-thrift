@@ -20,27 +20,22 @@
 package com.timecho.awesome.service.thrift;
 
 import com.timecho.aweseme.thrift.ICNodeRPCService;
-import com.timecho.awesome.conf.CNodeConfig;
-import com.timecho.awesome.conf.CNodeDescriptor;
-import com.timecho.awesome.conf.CNodeServerType;
-import com.timecho.awesome.conf.NodeConstant;
-import com.timecho.awesome.conf.ServiceType;
+import com.timecho.awesome.conf.*;
 import org.apache.thrift.TBaseAsyncProcessor;
 
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.ThreadPoolExecutor;
 
 public class CNodeRPCService extends ThriftService implements CNodeRPCServiceMBean {
 
-  private final static CNodeConfig CONF = CNodeDescriptor.getInstance().getConf();
+  private static final CNodeConfig CONF = CNodeDescriptor.getInstance().getConf();
 
   private static final CNodeServerType serverType = CONF.getCnServerType();
   private final Object cnProcessor;
 
   public CNodeRPCService() {
     super.mbeanName =
-      String.format(
-        "%s:%s=%s", this.getClass().getPackage(), NodeConstant.JMX_TYPE, getID().getJmxName());
+        String.format(
+            "%s:%s=%s", this.getClass().getPackage(), NodeConstant.JMX_TYPE, getID().getJmxName());
 
     switch (serverType) {
       case SYNC:
@@ -55,7 +50,6 @@ public class CNodeRPCService extends ThriftService implements CNodeRPCServiceMBe
     }
   }
 
-
   @Override
   public ServiceType getID() {
     return ServiceType.CNODE_SERVICE;
@@ -69,7 +63,8 @@ public class CNodeRPCService extends ThriftService implements CNodeRPCServiceMBe
         break;
       case ASYNC:
       default:
-        this.processor = new ICNodeRPCService.AsyncProcessor<>((ICNodeRPCService.AsyncIface) cnProcessor);
+        this.processor =
+            new ICNodeRPCService.AsyncProcessor<>((ICNodeRPCService.AsyncIface) cnProcessor);
         break;
     }
   }
@@ -79,37 +74,40 @@ public class CNodeRPCService extends ThriftService implements CNodeRPCServiceMBe
     switch (serverType) {
       case SYNC:
         thriftServiceThread =
-          new ThriftServiceThread(
-            processor,
-            getID().getName(),
-            ServiceType.CNODE_SERVICE.getName(),
-            getBindIP(),
-            getBindPort(),
-            CONF.getCnMinWorkerThreadNum(),
-            CONF.getCnMaxWorkerThreadNum(),
-            NodeConstant.THRIFT_SERVER_AWAIT_TIME_FOR_STOP_SERVICE,
-            new CNodeRPCSyncServiceHandler(),
-            NodeConstant.IS_ENABLE_THRIFT_COMPRESSION);
+            new ThriftServiceThread(
+                processor,
+                getID().getName(),
+                ServiceType.CNODE_SERVICE.getName(),
+                getBindIP(),
+                getBindPort(),
+                CONF.getCnMinWorkerThreadNum(),
+                CONF.getCnMaxWorkerThreadNum(),
+                NodeConstant.THRIFT_SERVER_AWAIT_TIME_FOR_STOP_SERVICE,
+                new CNodeRPCSyncServiceHandler(),
+                NodeConstant.IS_ENABLE_THRIFT_COMPRESSION);
         break;
       case ASYNC:
       default:
         thriftServiceThread =
-          new ThriftServiceThread(
-            (TBaseAsyncProcessor<?>) processor,
-            getID().getName(),
-            ServiceType.CNODE_SERVICE.getName(),
-            getBindIP(),
-            getBindPort(),
-            CONF.getCnAsyncServiceSelectorNum(),
-            CONF.getCnMinWorkerThreadNum(),
-            CONF.getCnMaxWorkerThreadNum(),
-            NodeConstant.THRIFT_SERVER_AWAIT_TIME_FOR_STOP_SERVICE,
-            new CNodeRPCAsyncServiceHandler((CNodeRPCAsyncServiceProcessor) cnProcessor),
-            NodeConstant.IS_ENABLE_THRIFT_COMPRESSION,
-            NodeConstant.CONNECTION_TIMEOUT_IN_MS,
-            NodeConstant.THRIFT_FRAME_MAX_SIZE);
+            new ThriftServiceThread(
+                (TBaseAsyncProcessor<?>) processor,
+                getID().getName(),
+                ServiceType.CNODE_SERVICE.getName(),
+                getBindIP(),
+                getBindPort(),
+                CONF.getCnAsyncServiceSelectorNum(),
+                CONF.getCnMinWorkerThreadNum(),
+                CONF.getCnMaxWorkerThreadNum(),
+                NodeConstant.THRIFT_SERVER_AWAIT_TIME_FOR_STOP_SERVICE,
+                new CNodeRPCAsyncServiceHandler((CNodeRPCAsyncServiceProcessor) cnProcessor),
+                NodeConstant.IS_ENABLE_THRIFT_COMPRESSION,
+                NodeConstant.CONNECTION_TIMEOUT_IN_MS,
+                NodeConstant.THRIFT_FRAME_MAX_SIZE);
+        //        ((CNodeRPCAsyncServiceProcessor) cnProcessor)
+        //          .setExecutorService((ThreadPoolExecutor)
+        // this.thriftServiceThread.getExecutorService());
         ((CNodeRPCAsyncServiceProcessor) cnProcessor)
-          .setExecutorService((ThreadPoolExecutor) this.thriftServiceThread.getExecutorService());
+            .setExecutorService(this.thriftServiceThread.getExecutorService());
         break;
     }
 

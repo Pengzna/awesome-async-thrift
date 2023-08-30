@@ -20,6 +20,7 @@
 package com.timecho.awesome.concurrent;
 
 import com.timecho.awesome.concurrent.threadpool.WrappedThreadPoolExecutor;
+import com.timecho.awesome.utils.LoomFiberUtils;
 import org.apache.thrift.server.TThreadPoolServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -71,4 +72,11 @@ public class ThreadPoolFactory {
       new IoTThreadFactory(poolName),
       poolName);
   }
+
+  /** Function for creating thrift rpc client thread pool with fiber. */
+  public static ExecutorService createThriftRpcClientThreadPool() {
+    LOGGER.info(NEW_SYNCHRONOUS_QUEUE_THREAD_POOL_LOGGER_FORMAT, "fiber");
+    return LoomFiberUtils.asyncFiberExecutor();
+  }
+
 }
